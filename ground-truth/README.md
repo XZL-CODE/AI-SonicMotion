@@ -156,20 +156,32 @@ Still looking up\
 
 副歌、桥段和尾副歌里的关键句以大字逐词落下的方式出现在画面中，在 `song.json` 里以 `hook` 标记。
 
+## 封面
+
+`covers/` 里是为这首歌画的发布封面，手写 SVG，导出为 JPG（导出命令见[仓库 README](../README.md)）。画面取自副歌"云上日落"：太阳压在云线上，英文歌名在天上，"落地"在云线之下；文字为歌名、"AI 原创 · 深夜 R&B"与副歌句。
+
+| 文件 | 用途 |
+|---|---|
+| `bilibili.svg` → `bilibili.jpg` | B 站，16:9，1920×1080；文字在中间 4:3 内，底部两角留给角标 |
+| `wechat.svg` → `wechat.jpg` | 公众号头条，2.35:1，1410×600；信息都在中间 600×600 |
+| `wechat-square.jpg` | 公众号中间 600×600，用于 1:1 转发卡片与次条封面 |
+
 ## 文件
 
 | 文件 | 内容 |
 |---|---|
 | `song.json` | 风格描述、生成参数、音色参考、分段歌词（英文 + 中文译文、`hook` 标记）、每段的画面场景与章节标题 |
+| `scenes.py` | 本曲各段画面：跑道、爬升入云、云上日落、盘旋、河与石、穿云下降、城市进近、落地，以及随节拍的光脉冲、雨、流星、星座连线、HUD 频谱环等 |
 | `timbre-reference.mp3` | 音色参考：用户选定的样例 B |
 | `composition-take7.json` | 选定的作曲：take 7 的模型规划与音频编码 |
+| `covers/` | 发布封面（见上节） |
 
 ## 重新生成
 
 ```bash
-python3 music/generate.py works/ground-truth --seeds 7 --suffix _b --codes works/ground-truth/composition-take7.json
-python3 music/analyze.py works/ground-truth outputs/ground-truth/takes/take_7_b.wav
-python3 video/render.py works/ground-truth outputs/ground-truth/analysis/take_7_b.json
+python3 engine/music/generate.py ground-truth --seeds 7 --suffix _b --codes ground-truth/composition-take7.json
+python3 engine/music/analyze.py ground-truth ground-truth/outputs/takes/take_7_b.wav
+python3 engine/video/render.py ground-truth ground-truth/outputs/analysis/take_7_b.json
 ```
 
-音频与视频输出在 `outputs/ground-truth/`（不入库）。环境准备见[仓库 README](../../README.md)。
+在仓库根目录运行。音频、分析与视频输出在 `outputs/`（不入库）。环境准备见[仓库 README](../README.md)。

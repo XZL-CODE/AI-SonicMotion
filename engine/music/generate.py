@@ -1,14 +1,14 @@
 """Generate song takes for a work with acestep.cpp (ACE-Step 1.5).
 
 Each seed gives one take: ace-lm plans the song (metadata + audio codes) from the
-caption and lyrics in works/<name>/song.json, then ace-synth renders it to audio,
+caption and lyrics in <song>/song.json, then ace-synth renders it to audio,
 matching the tonal quality of the work's timbre reference when song.json names one.
 
 Usage:
-    python3 music/generate.py works/ground-truth --seeds 7 11 23
+    python3 engine/music/generate.py ground-truth --seeds 7 11 23
     # keep an earlier composition, synthesise it again (e.g. with the timbre reference)
-    python3 music/generate.py works/ground-truth --seeds 7 --suffix _b \\
-        --codes works/ground-truth/composition-take7.json
+    python3 engine/music/generate.py ground-truth --seeds 7 --suffix _b \\
+        --codes ground-truth/composition-take7.json
 """
 import argparse
 import json
@@ -19,7 +19,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def lyrics_text(sections):
@@ -42,11 +42,11 @@ def run(cmd, log_path):
 
 def main():
     ap = argparse.ArgumentParser(description="Generate song takes with acestep.cpp")
-    ap.add_argument("work", help="work directory containing song.json")
+    ap.add_argument("work", help="song directory containing song.json")
     ap.add_argument("--seeds", type=int, nargs="+", default=[7], help="one take per seed")
     ap.add_argument("--acestep", default=os.environ.get("ACESTEP_DIR", str(ROOT / ".tools" / "acestep.cpp")),
-                    help="acestep.cpp checkout with build/ and models/ (see music/setup_acestep.sh)")
-    ap.add_argument("--out", help="output directory (default: outputs/<work>/takes)")
+                    help="acestep.cpp checkout with build/ and models/ (see engine/music/setup_acestep.sh)")
+    ap.add_argument("--out", help="output directory (default: <song>/outputs/takes)")
     ap.add_argument("--codes", help="planned request from an earlier run (an ace-lm output such as "
                                     "take_70.json): skip the LM and re-synthesise that composition")
     ap.add_argument("--ref-audio", help="timbre reference (default: song.json timbre_reference; 'none' to disable)")
@@ -55,7 +55,7 @@ def main():
 
     work = Path(args.work).resolve()
     song = json.loads((work / "song.json").read_text(encoding="utf-8"))
-    out = Path(args.out) if args.out else ROOT / "outputs" / work.name / "takes"
+    out = Path(args.out) if args.out else work / "outputs" / "takes"
     out.mkdir(parents=True, exist_ok=True)
     ace = Path(args.acestep)
     models = ace / "models"

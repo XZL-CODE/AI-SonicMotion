@@ -1,7 +1,8 @@
 """Scenes of the night flight. Each scene function draws the picture for one moment.
 
 Scene functions take (A, c): A holds the shared assets built once per worker process,
-c is the frame context (times, section progress, audio pulses; see render.FrameCtx).
+c is the frame context (times, section progress, audio pulses; see FrameCtx in
+engine/video/render.py, which loads this file and puts engine/video on the path for gfx).
 They return a float32 RGB image of the picture area (letterbox bars are added later).
 """
 import numpy as np
@@ -840,3 +841,4 @@ def ground(A, c):
 
 SCENES = {"runway": runway, "climb": climb, "above": above, "holding": holding, "river_stone": river_stone,
           "descent": descent, "city": city, "ground": ground}
+FLASH_INTO = {"above", "city"}  # scenes that open with a burst of light

@@ -1,14 +1,16 @@
-"""Frame-by-frame renderer for a work: scenes per section, beat-driven light, lyric subtitles.
+"""Frame-by-frame renderer for a song: scenes per section, beat-driven light, lyric subtitles.
 
-Inputs are the work's song.json (sections, scenes, lyrics + translations) and the analysis
-json from music/analyze.py (beats, kicks, per-frame energy, word timing).
+Inputs are the song's song.json (sections, scenes, lyrics + translations), its scenes.py
+(one drawing function per scene name) and the analysis json from engine/music/analyze.py
+(beats, kicks, per-frame energy, word timing).
 
 Usage:
-    python3 video/render.py works/ground-truth outputs/ground-truth/analysis/take_7.json
-    python3 video/render.py ... --stills 12,48,95        # PNG previews at those seconds
-    python3 video/render.py ... --start 40 --end 70      # render a clip
+    python3 engine/video/render.py ground-truth ground-truth/outputs/analysis/take_7.json
+    python3 engine/video/render.py ... --stills 12,48,95        # PNG previews at those seconds
+    python3 engine/video/render.py ... --start 40 --end 70      # render a clip
 """
 import argparse
+import importlib.util
 import json
 import subprocess
 import sys
@@ -22,9 +24,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gfx  # noqa: E402
-import scenes  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 FONT_DIR = ROOT / ".tools" / "fonts"
 FONTS = {  # OFL fonts from the Google Fonts repository
     "serif": "ofl/cormorantgaramond/CormorantGaramond%5Bwght%5D.ttf",
@@ -32,7 +33,6 @@ FONTS = {  # OFL fonts from the Google Fonts repository
     "cjk": "ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf",
 }
 TRANSITION = 1.2  # seconds of crossfade between sections
-FLASH_INTO = {"above", "city"}  # scenes that open with a burst of light
 
 
 FALLBACK_FONTS = {  # used when the OFL fonts cannot be downloaded (offline, blocked network)
@@ -369,11 +369,20 @@ class Typesetter:
 G = {}
 
 
+def load_scenes(work):
+    """The song's own scenes.py: Assets, SCENES (scene name -> drawing function), optional FLASH_INTO."""
+    spec = importlib.util.spec_from_file_location("scenes", Path(work) / "scenes.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def init_worker(work, analysis, W, H, scale):
     song = json.loads((Path(work) / "song.json").read_text(encoding="utf-8"))
     an = json.loads(Path(analysis).read_text(encoding="utf-8"))
+    scenes = load_scenes(work)
     bar = int(round((H - W / 2.35) / 2))
-    G.update(song=song, an=an, W=W, H=H, bar=bar, scale=scale, tl=Timeline(song, an),
+    G.update(song=song, an=an, W=W, H=H, bar=bar, scale=scale, tl=Timeline(song, an), scenes=scenes,
              A=scenes.Assets(W, H - 2 * bar), ts=Typesetter(W, H, bar, song, an, scale))
 
 
@@ -386,7 +395,7 @@ def zoom(img8, f):
 
 
 def render_frame(t):
-    A, tl = G["A"], G["tl"]
+    A, tl, scenes = G["A"], G["tl"], G["scenes"]
     pic, main = None, None
     blend = tl.blend(t)
     for i, w in blend:
@@ -400,7 +409,7 @@ def render_frame(t):
             main = (c, w)
     c = main[0]
     for sec in tl.secs:  # a burst of light where the song opens into a new scene
-        if sec["scene"] in FLASH_INTO and 0 <= t - sec["start"] < 0.9:
+        if sec["scene"] in getattr(scenes, "FLASH_INTO", ()) and 0 <= t - sec["start"] < 0.9:
             pic += 0.5 * np.exp(-(t - sec["start"]) / 0.2) * np.array([1.0, 0.9, 0.78], np.float32)
     if len(blend) == 2:  # a warm light leak sweeps across every transition
         w2 = blend[1][1]
@@ -428,10 +437,10 @@ def render_frame(t):
 
 def main():
     ap = argparse.ArgumentParser(description="Render the music video")
-    ap.add_argument("work")
-    ap.add_argument("analysis")
+    ap.add_argument("work", help="song directory containing song.json and scenes.py")
+    ap.add_argument("analysis", help="analysis json from engine/music/analyze.py")
     ap.add_argument("--audio", help="audio to mux (default: the analysed take)")
-    ap.add_argument("--out", help="output mp4 (default: outputs/<work>/<take>.mp4)")
+    ap.add_argument("--out", help="output mp4 (default: <song>/outputs/<take>.mp4)")
     ap.add_argument("--width", type=int, default=1920)
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--start", type=float, default=0.0)
@@ -447,7 +456,7 @@ def main():
     scale = W / 1920
     work = str(Path(args.work).resolve())
     take = Path(args.analysis).stem
-    out_dir = ROOT / "outputs" / Path(work).name
+    out_dir = Path(work) / "outputs"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if args.stills:
@@ -464,7 +473,7 @@ def main():
     end = args.end if args.end else an["duration"]
     times = np.arange(args.start, end, 1.0 / args.fps)
     out = Path(args.out) if args.out else out_dir / f"{take}.mp4"
-    audio = args.audio or an["audio"]
+    audio = args.audio or str(Path(work) / an["audio"])  # analyze.py stores it relative to the song
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
            "-r", str(args.fps), "-i", "-", "-ss", str(args.start), "-t", str(end - args.start), "-i", audio,
            "-c:v", "libx264", "-preset", "slow", "-crf", str(args.crf), "-pix_fmt", "yuv420p",

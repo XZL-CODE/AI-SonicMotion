@@ -5,7 +5,7 @@ song.json with a global (Needleman-Wunsch) alignment, so repeated choruses map i
 and words the recogniser misses are interpolated from their neighbours.
 
 Usage:
-    python3 music/analyze.py works/ground-truth outputs/ground-truth/takes/take_7.wav
+    python3 engine/music/analyze.py ground-truth ground-truth/outputs/takes/take_7.wav
 """
 import argparse
 import difflib
@@ -17,7 +17,7 @@ from pathlib import Path
 import librosa
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 SR = 22050
 HOP = 512
 WHISPER = os.environ.get("WHISPER_MODEL", "deepdml/faster-whisper-large-v3-turbo-ct2")  # repo id or local dir
@@ -181,17 +181,22 @@ def sections_timing(song, lines, downbeats, duration):
 
 def main():
     ap = argparse.ArgumentParser(description="Analyse a take for video rendering")
-    ap.add_argument("work", help="work directory containing song.json")
+    ap.add_argument("work", help="song directory containing song.json")
     ap.add_argument("audio", help="take audio (wav)")
     ap.add_argument("--fps", type=int, default=30)
-    ap.add_argument("--out", help="output json (default: outputs/<work>/analysis/<take>.json)")
+    ap.add_argument("--out", help="output json (default: <song>/outputs/analysis/<take>.json)")
     args = ap.parse_args()
 
     work = Path(args.work).resolve()
     song = json.loads((work / "song.json").read_text(encoding="utf-8"))
     y, _ = librosa.load(args.audio, sr=SR, mono=True)
     duration = len(y) / SR
-    result = {"audio": str(Path(args.audio).resolve()), "duration": round(duration, 3), "fps": args.fps}
+    audio = Path(args.audio).resolve()
+    try:
+        audio = audio.relative_to(work)  # stays valid when the song directory moves or is cloned
+    except ValueError:
+        pass
+    result = {"audio": str(audio), "duration": round(duration, 3), "fps": args.fps}
     result.update(rhythm(y, args.fps, duration))
     heard = transcribe(args.audio)
     result["lines"], coverage = lyric_timing(song, heard, duration)
@@ -199,7 +204,7 @@ def main():
     result["heard_ratio"] = round(coverage, 3)
     result["transcript"] = " ".join(w["w"] for w in heard)
 
-    out = Path(args.out) if args.out else ROOT / "outputs" / work.name / "analysis" / (Path(args.audio).stem + ".json")
+    out = Path(args.out) if args.out else work / "outputs" / "analysis" / (Path(args.audio).stem + ".json")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
     print(f"tempo {result['tempo']}  beats {len(result['beats'])}  kicks {len(result['kicks'])}  "

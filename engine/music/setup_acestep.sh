@@ -5,11 +5,11 @@
 # macOS (Apple Silicon) builds with Metal automatically; Linux builds for the CPU.
 # Needs: git, cmake, a C++17 compiler, python3, and the `hf` CLI (pip install -U huggingface_hub).
 #
-# Usage: bash music/setup_acestep.sh          # into .tools/acestep.cpp
-#        ACESTEP_DIR=/path bash music/setup_acestep.sh
+# Usage: bash engine/music/setup_acestep.sh          # into .tools/acestep.cpp
+#        ACESTEP_DIR=/path bash engine/music/setup_acestep.sh
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 DIR="${ACESTEP_DIR:-$ROOT/.tools/acestep.cpp}"
 REPO="https://github.com/ServeurpersoCom/acestep.cpp"
 COMMIT="de858d8e1a94f0e1939cf9bdd8ff7d9631953077"
