@@ -35,7 +35,7 @@ python3 video/render.py works/ground-truth outputs/ground-truth/analysis/take_7_
 python3 music/generate.py works/ground-truth --seeds 11 23 42
 ```
 
-访问 Hugging Face 受限时，先 `export HF_ENDPOINT=https://hf-mirror.com`（模型与 Whisper 都走它）。字体下载失败时自动改用系统字体。
+访问 Hugging Face 受限时，先 `export HF_ENDPOINT=https://hf-mirror.com HF_HUB_DISABLE_XET=1`（模型与 Whisper 都走镜像，下载中断后重跑会续传）。字体下载失败时自动改用系统字体。
 
 Linux 同样可用，走 CPU。上游默认只用一半核心，没有超线程的机器设 `ACE_THREADS=<核心数>`；4 核 CPU 生成一版约 3.5 分钟的歌要 30 分钟左右。
 

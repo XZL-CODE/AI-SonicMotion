@@ -1,6 +1,6 @@
 #!/bin/bash
 # Fetch a pinned acestep.cpp (C++ runtime for ACE-Step 1.5), build ace-lm / ace-synth,
-# and download the quantized models (~7.7 GB, Q8_0 turbo + 4B LM).
+# and download the quantized models (~7.7 GB, Q8_0 turbo + 4B LM; re-running resumes).
 #
 # macOS (Apple Silicon) builds with Metal automatically; Linux builds for the CPU.
 # Needs: git, cmake, a C++17 compiler, python3, and the `hf` CLI (pip install -U huggingface_hub).
@@ -68,5 +68,17 @@ fi
 cmake -S "$DIR" -B "$DIR/build" -DCMAKE_BUILD_TYPE=Release ${FLAGS[@]+"${FLAGS[@]}"}
 cmake --build "$DIR/build" --config Release -j "$(getconf _NPROCESSORS_ONLN)" --target ace-lm ace-synth
 
-(cd "$DIR" && bash ./models.sh)
+# Models: the Q8_0 turbo set (~7.7 GB) that upstream's models.sh picks by default, fetched here
+# with progress bars. Interrupted downloads resume. Where huggingface.co is slow or unreachable:
+#   export HF_ENDPOINT=https://hf-mirror.com HF_HUB_DISABLE_XET=1
+echo "downloading models from ${HF_ENDPOINT:-https://huggingface.co}"
+mkdir -p "$DIR/models"
+for f in vae-BF16.gguf Qwen3-Embedding-0.6B-Q8_0.gguf acestep-v15-turbo-Q8_0.gguf acestep-5Hz-lm-4B-Q8_0.gguf; do
+    if [ -f "$DIR/models/$f" ]; then
+        echo "[OK] $f"
+        continue
+    fi
+    echo "[Download] $f"
+    hf download Serveurperso/ACE-Step-1.5-GGUF "$f" --local-dir "$DIR/models"
+done
 echo "acestep.cpp ready in $DIR"
