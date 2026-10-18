@@ -67,6 +67,10 @@ def rhythm(y, fps, duration):
               "snap": per_frame(snap_env, times, fps, duration),
               "vocal": per_frame(vocal, times, fps, duration)}
     frames.update({k: per_frame(v, times, fps, duration) for k, v in bands.items()})
+    edges = np.geomspace(40, 11000, 25)  # 24 log-spaced bands for the instrument rings
+    spectrum = [per_frame(np.log1p(10 * S[(freqs >= lo) & (freqs < hi)].mean(0)), times, fps, duration)
+                for lo, hi in zip(edges[:-1], edges[1:])]
+    frames["spectrum"] = np.round(np.array(spectrum).T, 2).tolist()
     return {
         "tempo": round(float(np.atleast_1d(tempo)[0]), 2),
         "beats": [round(float(b), 3) for b in beats],

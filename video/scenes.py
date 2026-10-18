@@ -133,6 +133,8 @@ class Assets:
         d = rng.normal(0, 1, (5000, 2)) * [520, 700] + [2600, 7600]  # downtown: dense, cool, some tall
         add(np.c_[d[:, 0], rng.exponential(30, 5000), d[:, 1]], led, 0.9)
         add(np.c_[d[:1500, 0], rng.exponential(60, 1500), d[:1500, 1]], cool, 0.5)
+        tops = rng.normal(0, 1, (70, 2)) * [480, 620] + [2600, 7600]  # red obstruction lights on towers
+        self.beacons = np.c_[tops[:, 0], rng.uniform(90, 260, 70), tops[:, 1]]
 
         self.highways = []
         for x0, amp, ph in [(-2600, 900, 0.3), (1500, 700, 2.1), (4300, 1100, 4.0)]:
@@ -370,14 +372,43 @@ def fog_tunnel(A, t, speed, density, tint, top_light, under_light=(0.0, 0.0, 0.0
     return col.astype(np.float32), alpha.astype(np.float32)
 
 
-def hud(img, pitch, yaw, alpha, f, kick=0.0):
-    """Thin head-up display: pitch ladder, flight path marker and heading tape."""
+def shooting_star(img, c, area=(0.05, 0.95, 0.04, 0.45), every=2):
+    """A meteor after some snares (chosen and placed by the snare time, so each one differs)."""
+    age = c.t - c.last_snap
+    k = int(round(c.last_snap * 100))
+    if not (0 <= age < 0.65) or k % every:
+        return
+    rng = np.random.default_rng(k)
+    h, w = img.shape[:2]
+    x0, y0 = rng.uniform(area[0], area[1]) * w, rng.uniform(area[2], area[3]) * h
+    ang = rng.uniform(np.radians(148), np.radians(168))
+    length = rng.uniform(0.12, 0.24) * w
+    head, tail = gfx.smoothstep(0, 0.3, age), gfx.smoothstep(0.12, 0.65, age)
+    hx, hy = x0 + np.cos(ang) * length * head, y0 + np.sin(ang) * length * head
+    tx, ty = x0 + np.cos(ang) * length * tail, y0 + np.sin(ang) * length * tail
+    fade = 1 - gfx.smoothstep(0.4, 0.65, age)
+    draw_lines(img, np.array([tx]), np.array([ty]), np.array([hx]), np.array([hy]),
+               np.array([[0.8, 0.85, 1.0]], np.float32) * 0.9 * fade, width=2)
+    gfx.splat_points(img, np.array([hx]), np.array([hy]), np.array([[1.2, 1.2, 1.4]], np.float32) * fade,
+                     np.array([2.0]))
+
+
+def hud(img, pitch, yaw, alpha, f, kick=0.0, spectrum=None):
+    """Thin head-up display: pitch ladder, flight path marker, heading tape, a ring of live spectrum."""
     if alpha <= 0.01:
         return
     h, w = img.shape[:2]
     layer = Image.new("L", (w, h))
     dr = ImageDraw.Draw(layer)
     cx, cy = w / 2, h / 2
+    if spectrum is not None:  # the instruments listen too: one tick per band around the marker
+        bands = np.r_[spectrum, spectrum[::-1]]
+        su = w / 1920
+        for k, val in enumerate(bands):
+            ang = -np.pi / 2 + k / len(bands) * 2 * np.pi
+            r0, r1 = 44 * su, (52 + 52 * val) * su
+            dr.line([(cx + r0 * np.cos(ang), cy + r0 * np.sin(ang)), (cx + r1 * np.cos(ang), cy + r1 * np.sin(ang))],
+                    fill=int(120 + 120 * val), width=2)
     for deg in range(-20, 25, 5):
         y = cy + np.tan(pitch - np.radians(deg)) * f
         if not (40 < y < h - 40):
@@ -427,9 +458,25 @@ def runway(A, c):
         wake = np.ones(len(order))
     cols, mags = airport_lights(A, c, wake)
     L = np.zeros_like(img)
+    if c.tag != "Intro" or c.beat_count > 3:  # packets of light race out along the edges, one per beat
+        ph = c.beat_phase
+        zc = pos[2] + 25 + ph ** 0.7 * 2200 - np.arange(6) * 35
+        for x_edge in (-22.5, 22.5):
+            pts = np.c_[np.full(6, x_edge), np.full(6, 0.6), zc]
+            glow = (CYAN[None] * 4.0 * (1 - np.arange(6) / 6)[:, None] * (1 - ph) ** 0.5).astype(np.float32)
+            lights_layer(A, L, A.cam, pts, glow, np.ones(6, np.float32), pos, pitch, yaw, size=0.6)
     lights_layer(A, L, A.cam, R["pts"], cols, mags.astype(np.float32), pos, pitch, yaw,
                  size=0.3, streak=8 + 70 * speed if speed > 0.3 else None)
     img += L + wet_reflection(L, hy, 0.55) + light_haze(L, 0.35)
+    if c.tag != "Intro":  # rain, lit from below by the runway
+        rng = np.random.default_rng(9)
+        n = 380
+        sp = rng.uniform(900, 1500, n)
+        y = (rng.uniform(0, A.h, n) + c.t * sp) % (A.h + 80) - 40
+        x = (rng.uniform(0, A.w, n) - c.t * sp * 0.18) % A.w
+        ln = rng.uniform(14, 34, n) * (A.w / 1920)
+        br = rng.uniform(0.03, 0.10, n) * (0.6 + 0.8 * y / A.h) * gfx.smoothstep(0.0, 0.15, c.p)
+        draw_lines(img, x, y, x + ln * 0.18, y - ln, np.c_[br, br, br * 1.1].astype(np.float32), width=1)
 
     # the line: faint threads joining consecutive edge lights that are awake (signal path)
     edge = np.where(kind == 0)[0]
@@ -448,6 +495,7 @@ def runway(A, c):
     gfx.splat_points(img, bx, by, bc * (0.8 + 0.2 * np.sin(c.t + rng.uniform(0, 6, (70, 1)))),
                      rng.uniform(4, 11, 70))
     c.bloom_strength = 0.9
+    c.punch = 0.006
     return img
 
 
@@ -471,10 +519,20 @@ def climb(A, c):
     dens = gfx.smoothstep(0.12, 0.7, p)
     fcol, acc = fog_tunnel(A, c.t, 0.35 + 0.25 * p, 1.4 * dens, (0.16, 0.18, 0.24), (0.10, 0.10, 0.14))
     img = gfx.lerp(img, upscale(A, fcol), upscale(A, acc[..., None]))
-    hud(img, pitch, yaw, gfx.smoothstep(0.2, 0.5, p), A.cam.f, c.kick_pulse)
+    rng = np.random.default_rng(4)  # speed lines streaming past inside the cloud
+    n = 80
+    ang = rng.uniform(0, 2 * np.pi, n)
+    ph = (rng.uniform(0, 1, n) + c.t * rng.uniform(0.8, 1.6, n)) % 1.0
+    r0 = (0.1 + ph * 0.9) * A.w * 0.55
+    r1 = r0 + (0.04 + 0.12 * ph) * A.w
+    a = dens * (1 - gfx.smoothstep(0.85, 1.0, p)) * 0.16 * np.sin(np.pi * ph)
+    draw_lines(img, A.w / 2 + np.cos(ang) * r0, A.h / 2 + np.sin(ang) * r0 * 0.6, A.w / 2 + np.cos(ang) * r1,
+               A.h / 2 + np.sin(ang) * r1 * 0.6, np.c_[a, a, a * 1.1].astype(np.float32), width=1)
+    hud(img, pitch, yaw, gfx.smoothstep(0.2, 0.5, p), A.cam.f, c.kick_pulse, c.spectrum)
     flash = gfx.smoothstep(0.88, 1.0, p)  # the cloud top breaks open
     img += flash ** 2 * np.array([1.4, 1.0, 0.7], np.float32)
     c.bloom_strength = 0.7
+    c.punch = 0.008
     return img
 
 
@@ -488,6 +546,11 @@ def _above(A, c, sky_stops, sun_el, sun_az, light, shadow, gap, fog_col, extra_p
                           sky_amb=(0.10, 0.08, 0.20), roll=roll, drift=(c.t * 0.8, 0.0))
     low = gfx.lerp(low, ccol, cov[..., None])
     img = upscale(A, low)
+    sx, sy, sz = A.cam.project(sun_dir[None] * 1e5, (0, 0, 0), pitch, yaw, roll)
+    if sz[0] > 0:  # shafts of light from the sun through the haze, and the lens catching it
+        img += gfx.god_rays(img, sx[0], sy[0], threshold=1.0, strength=0.45 + 0.35 * c.kick_pulse)
+        on_screen = gfx.smoothstep(-0.2, 0.05, min(sx[0], A.w - sx[0]) / A.w)
+        gfx.lens_flare(img, sx[0], sy[0], (0.7 + 0.5 * c.kick_pulse) * on_screen)
     return img, pos, pitch, roll, sun_dir
 
 
@@ -512,8 +575,20 @@ def above(A, c):
     tw = 0.65 + 0.35 * np.sin(P[:, 3] * 40 + c.t * 3) + 0.8 * c.snap_pulse * (P[:, 3] > 0.5)
     col = GOLD[None] * (tw * fade * np.clip(300 / z, 0.15, 1.6))[:, None]
     gfx.splat_points(img, sx[vis], sy[vis], col[vis].astype(np.float32) * 1.2, np.clip(380 / z[vis], 0.6, 3.5))
+    # nearby answers join into constellations, brighter on the snare
+    near = vis & (z < 700) & (fade > 0.3)
+    px, py = sx[near], sy[near]
+    if len(px) > 1:
+        reach = 170 * A.w / 1920
+        d = np.hypot(px[:, None] - px[None], py[:, None] - py[None])
+        i, j = np.where(np.triu((d < reach) & (d > 4), 1))
+        i, j = i[:240], j[:240]
+        a = (1 - d[i, j] / reach) * 0.16 * (0.6 + 0.9 * c.snap_pulse)
+        draw_lines(img, px[i], py[i], px[j], py[j], (GOLD[None] * a[:, None]).astype(np.float32), width=1)
+    shooting_star(img, c)
     c.bloom_strength = 0.75
     c.streak = 0.35 + 0.35 * c.kick_pulse
+    c.punch = 0.010
     return img
 
 
@@ -539,10 +614,28 @@ def holding(A, c):
         layer_pts.append(np.c_[px, np.full_like(px, centre[1]) + 5 * k, pz])
         age = loops - 1 - k
         layer_col.append(np.tile(GOLD * (0.55 * 0.72 ** age) * (1 - 0.8 * smear), (len(px), 1)))
+    # a faint chart grid lies on the cloud tops, the map that the wind will not read
+    for axis in (0, 2):
+        for off in np.arange(-3000, 3001, 500):
+            run = np.linspace(-3000, 3000, 40)
+            pts = np.zeros((40, 3))
+            pts[:, axis] = np.round((pos[axis] + off) / 500) * 500
+            pts[:, 2 - axis] = pos[2 - axis] + run
+            pts[:, 1] = 30.0
+            sx, sy, z = A.cam.project(pts, pos, pitch, yaw, roll)
+            ok = (z[:-1] > 20) & (z[1:] > 20)
+            fade = (np.exp(-z[:-1] / 2500.0) * 0.05 * (1 - 0.7 * smear))[:, None]
+            draw_lines(img, sx[:-1][ok], sy[:-1][ok], sx[1:][ok], sy[1:][ok], (CYAN[None] * fade[ok]).astype(np.float32),
+                       width=1)
     for pts, col in zip(layer_pts, layer_col):
         sx, sy, z = A.cam.project(pts, pos, pitch, yaw, roll)
         ok = z[:-1] > 5
         draw_lines(img, sx[:-1][ok], sy[:-1][ok], sx[1:][ok], sy[1:][ok], col[:-1][ok], width=2)
+    if layer_pts:  # the pen: a comet at the tip of the loop being drawn
+        hx, hy, hz = A.cam.project(layer_pts[-1][-1:], pos, pitch, yaw, roll)
+        if hz[0] > 5:
+            gfx.splat_points(img, hx, hy, (GOLD * 2.5 * (1 - 0.7 * smear))[None].astype(np.float32), np.array([2.5]))
+            gfx.lens_flare(img, hx[0], hy[0], 0.35 * (1 - smear) * (0.7 + 0.6 * c.kick_pulse))
     # wind: long thin streaks sweeping across the view
     rng = np.random.default_rng(3)
     n = 90
@@ -551,8 +644,10 @@ def holding(A, c):
     ln = rng.uniform(60, 220, n)
     draw_lines(img, wx, wy, wx - ln, wy + ln * 0.04,
                np.tile(np.array([0.5, 0.45, 0.6], np.float32) * (0.10 + 0.08 * c.high), (n, 1)), width=1)
+    shooting_star(img, c, every=3)
     c.bloom_strength = 0.7
     c.streak = 0.25
+    c.punch = 0.008
     return img
 
 
@@ -598,16 +693,31 @@ def river_stone(A, c):
         shade = 0.12 + 0.55 * max(0.0, float(n @ light))
         poly = [(cx + 95 * v[i, 0], cy - 95 * v[i, 1]) for i in f]
         tone = gfx.lerp(np.array([0.30, 0.34, 0.48]), GOLD, drop) * shade
+        edge = tone * (1.6 + 1.2 * c.kick_pulse) + 0.08
         dr.polygon(poly, fill=tuple(int(255 * min(1, t)) for t in tone),
-                   outline=tuple(int(255 * min(1, t)) for t in (tone * 1.6 + 0.08)))
+                   outline=tuple(int(255 * min(1, t)) for t in edge))
+    # a fine orbit around the stone: steady, exact, turning with the beat
+    rr = 150 * A.w / 1920
+    dr.ellipse([cx - rr, cy - rr * 0.32, cx + rr, cy + rr * 0.32], outline=(60, 66, 90), width=1)
+    orb = c.t / c.beat * np.pi / 2
+    ox, oy = cx + rr * np.cos(orb), cy + rr * 0.32 * np.sin(orb)
+    dr.ellipse([ox - 3, oy - 3, ox + 3, oy + 3], fill=(230, 220, 200))
     img += np.asarray(layer, np.float32) / 255
     landed = c.t - (c.start + c.dur * 0.93)
-    if landed > 0:  # ripple where the weight meets the ground
+    if landed > 0:  # ripple where the weight meets the ground, and the dust it throws up
         rr = 40 + landed * 420
         ring = Image.new("L", (w, h))
         ImageDraw.Draw(ring).ellipse([cx - rr, hy - rr * 0.12, cx + rr, hy + rr * 0.12], outline=255, width=2)
         img += (np.asarray(ring, np.float32) / 255 * np.exp(-landed * 1.6))[..., None] * GOLD
+        rng = np.random.default_rng(8)
+        ang = rng.uniform(np.pi, 2 * np.pi, 240)
+        speed = rng.uniform(80, 420, 240)
+        bx = cx + np.cos(ang) * speed * landed
+        by = hy + np.sin(ang) * speed * landed * 0.35 + 60 * landed ** 2
+        gfx.splat_points(img, bx, by, np.tile(GOLD * 0.5 * np.exp(-landed * 1.4), (240, 1)).astype(np.float32),
+                         np.full(240, 1.1))
     c.bloom_strength = 0.85
+    c.punch = 0.0
     return img
 
 
@@ -631,13 +741,19 @@ def descent(A, c):
     fcol, acc = fog_tunnel(A, c.t, 0.3, 1.5, (0.11, 0.12, 0.17), (0.05, 0.05, 0.08),
                            under_light=np.array([0.30, 0.15, 0.07]) * (0.4 + open_amt) * (1 + 0.5 * c.kick_pulse))
     # soft, slowly drifting breaks in the cloud; even an open break keeps a veil of mist
+    if c.kick_pulse > 0.05:  # each kick lights the cloud from inside, somewhere new
+        rng = np.random.default_rng(int(round(c.last_kick * 100)))
+        gx, gy = rng.uniform(0.15, 0.85) * A.lw, rng.uniform(0.25, 0.8) * A.lh
+        r2 = ((A.lxx - gx) ** 2 + (A.lyy - gy) ** 2) / (A.lw * 0.2) ** 2
+        fcol = fcol + (np.exp(-r2) * c.kick_pulse * 0.5)[..., None] * np.array([1.0, 0.75, 0.5], np.float32)
     holes = gfx.sample(A.fog_soft, A.lxx * 0.7 + c.t * 6.0, A.lyy * 0.7 - c.t * 3.0)
     # breaks open in the upper part of the view, where the far city is bright; near ground stays veiled
     reach = gfx.smoothstep(A.lh * 0.92, A.lh * 0.5, A.lyy)
     alpha = acc * (1 - 0.8 * reach * gfx.smoothstep(1.0 - open_amt, 1.45 - open_amt, holes))
     img = gfx.lerp(img, upscale(A, fcol), upscale(A, alpha[..., None]))
-    hud(img, pitch, yaw, 0.8 * (1 - open_amt), A.cam.f, c.kick_pulse)
+    hud(img, pitch, yaw, 0.8 * (1 - open_amt), A.cam.f, c.kick_pulse, c.spectrum)
     c.bloom_strength = 0.9
+    c.punch = 0.012
     return img
 
 
@@ -668,6 +784,9 @@ def city(A, c):
     L = np.zeros_like(img)
     lights_layer(A, L, A.cam, cy["pts"], cy["col"], mags.astype(np.float32), pos, pitch, yaw, roll, size=0.45)
     img += L + light_haze(L, 1.6, 6.0)
+    blink = 3.0 * np.exp(-c.beat_phase * 5)  # obstruction lights on the towers, on the beat
+    lights_layer(A, img, A.cam, A.beacons, np.tile(np.array([1.0, 0.12, 0.08], np.float32), (len(A.beacons), 1)),
+                 np.full(len(A.beacons), blink, np.float32), pos, pitch, yaw, roll, size=0.4)
     traffic(A, img, c, pos, pitch, yaw, roll)
     R = A.runway
     cols, mags = airport_lights(A, c, strobe=4.0)
@@ -676,8 +795,11 @@ def city(A, c):
                  yaw, roll, size=0.35, streak=30 * land if land > 0.6 else None)
     img += L + wet_reflection(L, A.cam.horizon_y(pitch), 0.4 * land)
     img += bump * np.array([0.5, 0.35, 0.2], np.float32)
+    if bump > 0.02:
+        gfx.lens_flare(img, A.w / 2, A.h * 0.62, 1.6 * bump)
     c.bloom_strength = 1.0
     c.streak = 0.3
+    c.punch = 0.014
     return img
 
 
@@ -710,7 +832,9 @@ def ground(A, c):
     L = np.zeros_like(img)
     lights_layer(A, L, A.cam, R["pts"] + np.array([0, 0, 3000.0]), cols, mags, pos, pitch, 0.0, size=0.35)
     img += L + wet_reflection(L, A.cam.horizon_y(pitch), 0.45) + light_haze(L, 0.3)
+    shooting_star(img, c, area=(0.05, 0.95, 0.02, 0.55), every=1)
     c.bloom_strength = 0.8
+    c.punch = 0.004
     return img
 
 

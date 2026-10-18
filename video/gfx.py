@@ -4,7 +4,7 @@ Images are float32 RGB arrays shaped (H, W, 3) in display space; values above 1 
 allowed until the final tone curve, so additive light can glow instead of clipping.
 """
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 
 
 def fbm_texture(size, beta, seed):
@@ -166,6 +166,55 @@ def bloom(img, threshold=0.8, strength=0.6, streak=0.0):
         strip = resize(resize(small, w // 48, h // 4), w // 4, h // 4)
         glow += streak * strip * np.array([0.55, 0.75, 1.0], np.float32)
     return img + resize(glow, w, h)
+
+
+def sample_clamped(img, x, y):
+    """Bilinear lookup of an (H, W, C) image at pixel coordinates, clamped at the edges."""
+    h, w = img.shape[:2]
+    x = np.clip(x, 0, w - 1.001)
+    y = np.clip(y, 0, h - 1.001)
+    x0 = x.astype(np.int32)
+    y0 = y.astype(np.int32)
+    fx = (x - x0)[..., None]
+    fy = (y - y0)[..., None]
+    top = img[y0, x0] * (1 - fx) + img[y0, x0 + 1] * fx
+    bottom = img[y0 + 1, x0] * (1 - fx) + img[y0 + 1, x0 + 1] * fx
+    return top * (1 - fy) + bottom * fy
+
+
+def god_rays(img, cx, cy, threshold=0.9, strength=0.5, samples=12, reach=0.7, scale=6):
+    """Light shafts streaming from a bright source at (cx, cy) through the image (computed at 1/scale)."""
+    h, w = img.shape[:2]
+    small = np.clip(resize(img, w // scale, h // scale) - threshold, 0, None)
+    sh, sw = small.shape[:2]
+    yy, xx = np.mgrid[0:sh, 0:sw].astype(np.float32)
+    sx, sy = cx / scale, cy / scale
+    acc = np.zeros_like(small)
+    weight, total = 1.0, 0.0
+    for i in range(samples):
+        f = 1 - reach * i / samples
+        acc += sample_clamped(small, sx + (xx - sx) * f, sy + (yy - sy) * f) * weight
+        total += weight
+        weight *= 0.92
+    return resize(acc / total, w, h) * strength
+
+
+# ghost discs of a lens flare: (position along source -> centre -> mirror, sigma in px, tint)
+FLARE_GHOSTS = [(0.55, 10, (1.0, 0.75, 0.45)), (1.25, 26, (0.45, 0.65, 1.0)), (1.55, 12, (0.9, 0.55, 1.0)),
+                (1.85, 40, (0.5, 1.0, 0.75)), (2.3, 70, (0.75, 0.6, 1.0))]
+
+
+def lens_flare(img, x, y, intensity):
+    """Additive lens flare for a light at (x, y): soft ghosts strung through the frame centre."""
+    if intensity <= 0.01:
+        return
+    h, w = img.shape[:2]
+    cx, cy = w / 2, h / 2
+    xs = np.array([x + (cx - x) * k for k, _, _ in FLARE_GHOSTS])
+    ys = np.array([y + (cy - y) * k for k, _, _ in FLARE_GHOSTS])
+    cols = np.array([t for _, _, t in FLARE_GHOSTS], np.float32) * 0.05 * intensity
+    sigmas = np.array([s for _, s, _ in FLARE_GHOSTS], np.float32) * (w / 1920)
+    splat_points(img, xs, ys, cols, sigmas)
 
 
 def tone(img):
