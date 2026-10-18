@@ -438,6 +438,7 @@ def main():
     ap.add_argument("--end", type=float)
     ap.add_argument("--stills", help="comma-separated seconds; writes PNGs instead of a video")
     ap.add_argument("--workers", type=int, default=0, help="processes (default: all cores)")
+    ap.add_argument("--crf", type=int, default=18, help="x264 quality: 18 near-lossless, 23 smaller file")
     args = ap.parse_args()
 
     an = json.loads(Path(args.analysis).read_text(encoding="utf-8"))
@@ -466,7 +467,7 @@ def main():
     audio = args.audio or an["audio"]
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
            "-r", str(args.fps), "-i", "-", "-ss", str(args.start), "-t", str(end - args.start), "-i", audio,
-           "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p",
+           "-c:v", "libx264", "-preset", "slow", "-crf", str(args.crf), "-pix_fmt", "yuv420p",
            "-af", "volume=-1dB", "-c:a", "aac", "-b:a", "256k", "-shortest", "-movflags", "+faststart", str(out)]
     ff = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     workers = args.workers or None
