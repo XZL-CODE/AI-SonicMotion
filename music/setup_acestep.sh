@@ -26,12 +26,19 @@ git -C "$DIR" fetch -q --depth 1 origin "$COMMIT"
 git -C "$DIR" checkout -q FETCH_HEAD
 git -C "$DIR" submodule update --init --depth 1 || git -C "$DIR" submodule update --init
 
-# Local patch: let ACE_THREADS set the CPU thread count. Upstream uses half the cores,
-# which suits SMT machines but leaves cores idle on machines without hyper-threading.
-python3 - "$DIR/src/backend.h" <<'EOF'
+# Local patches (idempotent):
+# 1. ACE_THREADS sets the CPU thread count. Upstream uses half the cores, which suits SMT
+#    machines but leaves cores idle on machines without hyper-threading.
+# 2. Apple's libc++ ships float std::from_chars but marks it available only from macOS 26,
+#    so older deployment targets fail to compile; use acestep's own parser there too.
+python3 - "$DIR/src" <<'EOF'
 import sys
-path = sys.argv[1]
-src = open(path).read()
+from pathlib import Path
+
+src = Path(sys.argv[1])
+
+path = src / "backend.h"
+text = path.read_text()
 old = """static int backend_cpu_n_threads(void) {
     int n = (int) std::thread::hardware_concurrency() / 2;"""
 new = """static int backend_cpu_n_threads(void) {
@@ -40,10 +47,17 @@ new = """static int backend_cpu_n_threads(void) {
         return atoi(env);
     }
     int n = (int) std::thread::hardware_concurrency() / 2;"""
-if "ACE_THREADS" not in src:
-    assert old in src, "backend.h changed upstream; update the patch"
-    src = "#include <cstdlib>\n" + src.replace(old, new)
-    open(path, "w").write(src)
+if "ACE_THREADS" not in text:
+    assert old in text, "backend.h changed upstream; update the patch"
+    path.write_text("#include <cstdlib>\n" + text.replace(old, new))
+
+path = src / "pipeline-synth-ops.cpp"
+text = path.read_text()
+old = "#if defined(_LIBCPP_VERSION) && _LIBCPP_VERSION < 200000"
+new = "#if defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION < 200000 || defined(__APPLE__))"
+if new not in text:
+    assert old in text, "pipeline-synth-ops.cpp changed upstream; update the patch"
+    path.write_text(text.replace(old, new))
 EOF
 
 if [ "$(uname)" = "Darwin" ]; then
