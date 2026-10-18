@@ -10,6 +10,7 @@ Usage:
 import argparse
 import difflib
 import json
+import os
 import re
 from pathlib import Path
 
@@ -19,7 +20,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 SR = 22050
 HOP = 512
-WHISPER = "deepdml/faster-whisper-large-v3-turbo-ct2"
+WHISPER = os.environ.get("WHISPER_MODEL", "deepdml/faster-whisper-large-v3-turbo-ct2")  # repo id or local dir
 
 
 def norm_word(w):

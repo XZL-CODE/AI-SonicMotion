@@ -104,6 +104,7 @@ class Assets:
     def _city(self, rng):
         """Street grid thinned by a district-density field, a bright downtown, and highways."""
         dens = gfx.smoothstep(-0.9, 1.1, gfx.fbm_texture(256, 1.8, 31))
+        self.city_dens = dens.astype(np.float32)
 
         def density(x, z):
             return gfx.sample(dens, (x + 8000) / 16000 * 256, (z + 2000) / 16000 * 256)
@@ -113,7 +114,7 @@ class Assets:
 
         def add(p, c, keep_prob):
             keep = rng.uniform(0, 1, len(p)) < keep_prob
-            keep &= (np.abs(p[:, 0]) > 260) | (p[:, 2] < -1000) | (p[:, 2] > 6500)  # airfield stays dark
+            keep &= (np.abs(p[:, 0]) > 260) | (p[:, 2] < 2200) | (p[:, 2] > 6500)  # the airfield stays dark
             pts.append(p[keep])
             col.append(np.repeat(np.array([c], np.float32), keep.sum(), 0))
 
@@ -285,6 +286,18 @@ def cloud_sea(A, cam, pos, pitch, yaw, sun_dir, light, shadow, gap, fog_col, sky
     return col, down.astype(np.float32)
 
 
+def city_glow(A, cam, pos, pitch, yaw, roll=0.0, amount=1.0):
+    """Light pollution on the ground: districts glow warm under their lights (low-res, additive)."""
+    dx, dy, dz = cam.rays(pitch, yaw, roll)
+    X, Z, dist, valid = gfx.plane_hits(dx, dy, dz, 0.0, pos[1])
+    x, z = pos[0] + X, pos[2] + Z
+    d = gfx.sample(A.city_dens, (x + 8000) / 16000 * 256, (z + 2000) / 16000 * 256)
+    core = np.exp(-(((x - 2600) / 900) ** 2 + ((z - 7600) / 1200) ** 2))  # downtown
+    strip = (np.abs(x) < 260) & (z > 2200) & (z < 6500)
+    glow = (0.06 + 0.5 * d ** 2 + 0.6 * core) * valid * ~strip * np.exp(-dist / 9000.0)
+    return (glow[..., None] * np.array([0.30, 0.15, 0.07], np.float32) * amount).astype(np.float32)
+
+
 def upscale(A, low):
     return gfx.resize(low, A.w, A.h)
 
@@ -441,12 +454,13 @@ def runway(A, c):
 def climb(A, c):
     """Pre-chorus: rotate, lift off, sink into grey; the instruments stay crisp."""
     p = c.p
-    pitch = np.radians(2 + 11 * gfx.smoothstep(0.0, 0.35, p))
+    pitch = np.radians(2 + 7 * gfx.smoothstep(0.0, 0.4, p))
     alt = 3 + 900 * gfx.smoothstep(0.05, 1.0, p) ** 1.5
     pos = (0.0, alt, 1000 + 120 * c.tau)
     yaw = np.radians(0.8 * np.sin(c.t * 0.4))
     roll = np.radians(1.5 * np.sin(c.t * 0.7)) + np.radians(0.6) * c.kick_pulse * np.sin(c.t * 40)
-    low, _ = sky(A, A.lcam, pitch, yaw, NIGHT_SKY, roll=roll)
+    low, _ = sky(A, A.lcam, pitch, yaw, CITY_SKY, roll=roll)
+    low += city_glow(A, A.lcam, pos, pitch, yaw, roll, 1.0 - 0.6 * p)
     img = upscale(A, low)
     stars(A, img, A.cam, pitch, yaw, c.t, 0.35 * (1 - p), roll=roll)
     R = A.runway
@@ -454,7 +468,7 @@ def climb(A, c):
     lights_layer(A, img, A.cam, R["pts"], cols, mags * (1 - p), pos, pitch, yaw, roll, size=0.35)
     cy = A.city
     lights_layer(A, img, A.cam, cy["pts"], cy["col"], cy["mag"] * 0.5 * (1 - p), pos, pitch, yaw, roll, size=0.6)
-    dens = gfx.smoothstep(0.15, 0.75, p)
+    dens = gfx.smoothstep(0.12, 0.7, p)
     fcol, acc = fog_tunnel(A, c.t, 0.35 + 0.25 * p, 1.4 * dens, (0.16, 0.18, 0.24), (0.10, 0.10, 0.14))
     img = gfx.lerp(img, upscale(A, fcol), upscale(A, acc[..., None]))
     hud(img, pitch, yaw, gfx.smoothstep(0.2, 0.5, p), A.cam.f, c.kick_pulse)
@@ -606,17 +620,21 @@ def descent(A, c):
     yaw = np.radians(1.0 * np.sin(c.t * 0.3))
     pos = (0.0, 1500 - 500 * p, -1800 + 90 * c.tau)
     low, _ = sky(A, A.lcam, pitch, yaw, CITY_SKY, roll=roll)
-    img = upscale(A, low) * 0.6
+    low += city_glow(A, A.lcam, pos, pitch, yaw, roll, 3.5 * (1 + 0.6 * c.kick_pulse))
+    img = upscale(A, low) * 0.8
     cy = A.city
     beat = 1.0 + 0.9 * c.kick_pulse
     L = np.zeros_like(img)
     lights_layer(A, L, A.cam, cy["pts"], cy["col"], 4.0 * cy["mag"] * beat, pos, pitch, yaw, roll, size=0.45)
-    img += L + light_haze(L, 1.6, 6.0)
+    img += L + light_haze(L, 2.4, 7.0)
     open_amt = gfx.smoothstep(0.25, 0.95, p)
     fcol, acc = fog_tunnel(A, c.t, 0.3, 1.5, (0.11, 0.12, 0.17), (0.05, 0.05, 0.08),
                            under_light=np.array([0.30, 0.15, 0.07]) * (0.4 + open_amt) * (1 + 0.5 * c.kick_pulse))
-    holes = gfx.sample(A.fog, A.lxx * 1.4 + c.t * 9.0, A.lyy * 1.4 - c.t * 4.0)
-    alpha = acc * (1 - gfx.smoothstep(1.0 - open_amt, 1.4 - open_amt, holes))
+    # soft, slowly drifting breaks in the cloud; even an open break keeps a veil of mist
+    holes = gfx.sample(A.fog_soft, A.lxx * 0.7 + c.t * 6.0, A.lyy * 0.7 - c.t * 3.0)
+    # breaks open in the upper part of the view, where the far city is bright; near ground stays veiled
+    reach = gfx.smoothstep(A.lh * 0.92, A.lh * 0.5, A.lyy)
+    alpha = acc * (1 - 0.8 * reach * gfx.smoothstep(1.0 - open_amt, 1.45 - open_amt, holes))
     img = gfx.lerp(img, upscale(A, fcol), upscale(A, alpha[..., None]))
     hud(img, pitch, yaw, 0.8 * (1 - open_amt), A.cam.f, c.kick_pulse)
     c.bloom_strength = 0.9
@@ -640,6 +658,7 @@ def city(A, c):
                            (0.07, 0.05, 0.07), (0.02, 0.02, 0.05), (0.10, 0.06, 0.06), height=900.0,
                            scale=1 / 420.0, roll=roll, fog_dist=6000)
     low = gfx.lerp(low, ccol, (cov * 0.9 * gfx.smoothstep(0.03, 0.2, el))[..., None])
+    low += city_glow(A, A.lcam, pos, pitch, yaw, roll, 1.2 * (1 + 0.4 * c.kick_pulse))
     img = upscale(A, low)
     cy = A.city
     ripple_r = ((c.t - c.last_kick) * 2600.0)

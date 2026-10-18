@@ -304,7 +304,7 @@ def main():
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
            "-r", str(args.fps), "-i", "-", "-ss", str(args.start), "-t", str(end - args.start), "-i", audio,
            "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p",
-           "-c:a", "aac", "-b:a", "256k", "-shortest", "-movflags", "+faststart", str(out)]
+           "-af", "volume=-1dB", "-c:a", "aac", "-b:a", "256k", "-shortest", "-movflags", "+faststart", str(out)]
     ff = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     workers = args.workers or None
     with Pool(workers, initializer=init_worker, initargs=(work, args.analysis, W, H, scale)) as pool:
