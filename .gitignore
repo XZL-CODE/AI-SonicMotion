@@ -1,0 +1,166 @@
+# Python开发环境
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+.tox/
+.nox/
+.hypothesis/
+.ipynb_checkpoints
+*.manifest
+*.spec
+
+# 前端开发环境
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn/
+.pnp.*
+.next/
+.nuxt/
+dist/
+build/
+*.tgz
+*.tar.gz
+.parcel-cache/
+.cache/
+
+# 编辑器和IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+.ropeproject
+.mr.developer.cfg
+.project
+.pydevproject
+.settings/
+*.swp
+*.swo
+*~
+
+# 操作系统生成的文件
+## Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+.apdisk
+.Trash/
+.MAXCOX
+__MAC__
+.localized
+
+## Linux
+*~
+.directory
+.Trash-*
+
+# 数据科学和机器学习
+## 保留文件夹结构但忽略内容
+model/*
+!model/.gitkeep
+# data/*
+# !data/.gitkeep
+**/model/*
+!**/model/.gitkeep
+# **/data/*
+# !**/data/.gitkeep
+models/*
+!models/.gitkeep
+datasets/*
+!datasets/.gitkeep
+checkpoints/*
+!checkpoints/.gitkeep
+runs/*
+!runs/.gitkeep
+
+# 运行产物：一键启动脚本写的日志、pid 与 Vite 缓存
+logs/
+.run/
+*.pid
+.vite/
+
+# 测试文件夹的特定忽略规则
+test/**/node_modules/
+test/**/.idea/
+test/**/.vscode/
+test/**/dist/
+test/**/build/
+test/**/.cache/
+test/**/.vite/
+
+
+# 大型文件和二进制文件
+#*.h5
+#*.pkl
+#*.pt
+#*.pth
+#*.onnx
+#*.tflite
+#*.pb
+#*.savedmodel
+#*.bin
+#*.npz
+#*.hdf5
+#*.joblib
+#*.tfevents.*
+#*.mp4
+#*.avi
+#*.mov
+#*.wmv
+#*.parquet
+
+# 日志和临时文件
+.tmp/
+tmp/
+temp/
+.temp/
+
+# 后端本机鉴权凭证，不进入版本库
+/半导体咨询-前后端/gateway/auth-center.local.ini
+
+# 虚拟环境和依赖
+.conda/
+.tensorflow/
+.torch/
+.keras/
+
+# 数据工作流输出
+outputs/
+
+# 日志文件
+*.log
