@@ -27,7 +27,7 @@ Agent Note 是决策与方向的简要记录，保留背景、选择、理由和
 
 | 迭代 | 状态 | 主 Note |
 | ---- | ---- | ------- |
-|      |      |         |
+| Ground Truth 音乐与 MV | 进行中 | [proposed/2026-10-18-ground-truth-music-video.md](proposed/2026-10-18-ground-truth-music-video.md) |
 
 ## 何时新增或更新
 

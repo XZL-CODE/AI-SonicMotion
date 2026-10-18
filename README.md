@@ -32,6 +32,10 @@ Linux 同样可用，走 CPU。上游默认只用一半核心，没有超线程�
 
 渲染预览：`--stills 12,48,95` 输出这几秒的 PNG；`--start 40 --end 70` 只渲染片段；`--width 960` 半分辨率。
 
+## 决策记录
+
+出歌方式、成片规格与个人信息边界见 [Agent Note：《Ground Truth · 落地》音乐与 MV 生成](.agents/notes/proposed/2026-10-18-ground-truth-music-video.md)。
+
 ## 许可与标注
 
 - ACE-Step 1.5 模型为 MIT 许可，模型卡说明生成内容可商用。
