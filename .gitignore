@@ -164,3 +164,6 @@ outputs/
 
 # 日志文件
 *.log
+
+# 本机工具链与字体（music/setup_acestep.sh、video/render.py 自动下载）
+.tools/
