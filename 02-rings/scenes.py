@@ -401,18 +401,16 @@ def roots(A, c):
     seg = R["seg"]
     vis = seg[:, 5] < front
     bx, by = A.base[0], A.base[1] - shift
-    f = 0.5
-    layer = Image.new("L", (w // 2, h // 2))
+    layer = Image.new("L", (w, h))
     d = ImageDraw.Draw(layer)
     for x0, y0, x1, y1, wd, s0, s1 in seg[vis]:
         k = min(1.0, (front - s0) / (s1 - s0))
-        d.line([((bx + x0 * h) * f, (by + y0 * h) * f),
-                ((bx + (x0 + (x1 - x0) * k) * h) * f, (by + (y0 + (y1 - y0) * k) * h) * f)],
-               fill=255, width=max(1, int(round(1.5 * wd * h * f))))
-    rl = gfx.resize(np.asarray(layer, np.float32)[..., None] / 255, w, h)
+        d.line([(bx + x0 * h, by + y0 * h), (bx + (x0 + (x1 - x0) * k) * h, by + (y0 + (y1 - y0) * k) * h)],
+               fill=255, width=max(1, int(round(1.5 * wd * h))))
+    rl = gfx.blur(np.asarray(layer, np.float32)[..., None] / 255, 0.8 * A.s)
     under = under * (1 - 0.4 * rl) + rl * AMBER * (0.30 + 0.12 * c.kick_pulse)
-    tips = seg[vis & (seg[:, 6] > front - 0.03)]
-    if len(tips):  # the growing ends glow
+    tips = seg[vis & (seg[:, 6] >= front)]
+    if len(tips):  # the ends still growing glow
         k = np.clip((front - tips[:, 5]) / (tips[:, 6] - tips[:, 5]), 0, 1)
         tx = bx + (tips[:, 0] + (tips[:, 2] - tips[:, 0]) * k) * h
         ty = by + (tips[:, 1] + (tips[:, 3] - tips[:, 1]) * k) * h
@@ -424,8 +422,8 @@ def roots(A, c):
         tw = 0.5 + 0.5 * np.sin(c.t * 2.0 + R["glint_phase"])
         gx = bx + path[0, 0] * h + g[:, 0] * 10 * A.s
         gy = by + path[0, 1] * h + 12 * A.s + g[:, 1] * 6 * A.s
-        gfx.splat_points(under, gx, gy, (WATER[None] * (0.05 + 0.25 * reached) * tw[:, None]).astype(np.float32),
-                         np.full(len(g), 1.2 * A.s))
+        gfx.splat_points(under, gx, gy, (WATER[None] * (0.08 + 0.55 * reached) * tw[:, None]).astype(np.float32),
+                         np.full(len(g), 1.4 * A.s))
         since = c.t - c.last_kick
         if reached > 0.99 and since < 1.4:  # water climbs the root after each kick
             s = path[:, 2]
