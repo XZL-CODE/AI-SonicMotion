@@ -6,7 +6,7 @@
 
 | 目录 | 歌名 | 风格 | 当前版本 |
 |---|---|---|---|
-| [`ground-truth/`](ground-truth/README.md) | Ground Truth · 落地 | 深夜 R&B / neo-soul，英文演唱配中文字幕 | 作曲 take 7 + 样例 B 音色；MV 第二版；B 站与公众号封面 |
+| [`1-ground-truth/`](1-ground-truth/README.md) | Ground Truth · 落地 | 深夜 R&B / neo-soul，英文演唱配中文字幕 | 作曲 take 7 + 样例 B 音色；MV 第二版；B 站与公众号封面 |
 
 ## 目录
 
@@ -29,8 +29,8 @@
 每首新歌都走完下面几步。风格每首重新定，不沿用上一首：
 
 1. 定风格：先分析这首歌的主题，写一段副歌；挑 3 个风格方向（2 个贴合主题，1 个刻意反差），每个方向用同一段副歌出一版约 30 秒的试听样曲，并配一句画面设想；听过、选定风格后再往下走。
-2. 在根目录新建与 `ground-truth/` 并列的目录，写完整歌词和 `song.json`（风格、参数、分段歌词与译文、每段场景），以及这首歌自己的 `scenes.py`。
-3. 生成、挑选、分析、渲染（命令见下节，把 `ground-truth` 换成新目录）。
+2. 在根目录新建与 `1-ground-truth/` 并列的目录，目录名为“序号-英文短名”，序号接着作品表往下排（下一首是 `2-…`）；写完整歌词和 `song.json`（风格、参数、分段歌词与译文、每段场景），以及这首歌自己的 `scenes.py`。
+3. 生成、挑选、分析、渲染（命令见下节，把 `1-ground-truth` 换成新目录）。
 4. 写这首歌的 `README.md`：歌名、简介、歌词，以及段落与画面、文件、重新生成命令。
 5. 画封面：按这首歌的内容与画面单独设计，手写 SVG，导出 JPG，放在 `<歌>/covers/`，两种都要：
    - B 站：16:9，1920×1080。文字放在中间 4:3（x 240–1680），手机首页按这块裁切；底部两角留给播放量和时长角标。
@@ -47,12 +47,12 @@ python3 -m venv .venv && source .venv/bin/activate && pip install -r requirement
 bash engine/music/setup_acestep.sh                             # 首次：编译 + 下载模型
 
 # 用音色参考重新合成选定的作曲（take 7），再分析、渲染
-python3 engine/music/generate.py ground-truth --seeds 7 --suffix _b --codes ground-truth/composition-take7.json
-python3 engine/music/analyze.py ground-truth ground-truth/outputs/takes/take_7_b.wav
-python3 engine/video/render.py ground-truth ground-truth/outputs/analysis/take_7_b.json
+python3 engine/music/generate.py 1-ground-truth --seeds 7 --suffix _b --codes 1-ground-truth/composition-take7.json
+python3 engine/music/analyze.py 1-ground-truth 1-ground-truth/outputs/takes/take_7_b.wav
+python3 engine/video/render.py 1-ground-truth 1-ground-truth/outputs/analysis/take_7_b.json
 
 # 或者生成新的作曲（同样带音色参考），每个种子一版
-python3 engine/music/generate.py ground-truth --seeds 11 23 42
+python3 engine/music/generate.py 1-ground-truth --seeds 11 23 42
 ```
 
 访问 Hugging Face 受限时，先 `export HF_ENDPOINT=https://hf-mirror.com HF_HUB_DISABLE_XET=1`（模型与 Whisper 都走镜像，下载中断后重跑会续传）。字体下载失败时自动改用系统字体。
@@ -64,7 +64,7 @@ Linux 同样可用，走 CPU。上游默认只用一半核心，没有超线程�
 封面导出用无头 Chrome 截图再裁切（窗口要比画布高，否则底部会留白），macOS 上 `CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"`：
 
 ```bash
-cd ground-truth/covers
+cd 1-ground-truth/covers
 "$CHROME" --headless=new --hide-scrollbars --window-size=1920,1300 --screenshot=/tmp/b.png "file://$PWD/bilibili.svg"
 "$CHROME" --headless=new --hide-scrollbars --window-size=1410,800 --screenshot=/tmp/w.png "file://$PWD/wechat.svg"
 ffmpeg -y -i /tmp/b.png -vf crop=1920:1080:0:0 -q:v 2 bilibili.jpg

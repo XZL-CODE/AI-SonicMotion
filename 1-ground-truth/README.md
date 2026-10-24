@@ -186,9 +186,9 @@ Still looking up\
 ## 重新生成
 
 ```bash
-python3 engine/music/generate.py ground-truth --seeds 7 --suffix _b --codes ground-truth/composition-take7.json
-python3 engine/music/analyze.py ground-truth ground-truth/outputs/takes/take_7_b.wav
-python3 engine/video/render.py ground-truth ground-truth/outputs/analysis/take_7_b.json
+python3 engine/music/generate.py 1-ground-truth --seeds 7 --suffix _b --codes 1-ground-truth/composition-take7.json
+python3 engine/music/analyze.py 1-ground-truth 1-ground-truth/outputs/takes/take_7_b.wav
+python3 engine/video/render.py 1-ground-truth 1-ground-truth/outputs/analysis/take_7_b.json
 ```
 
 在仓库根目录运行。音频、分析与视频输出在 `outputs/`（不入库）。环境准备见[仓库 README](../README.md)。

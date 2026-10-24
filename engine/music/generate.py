@@ -5,10 +5,10 @@ caption and lyrics in <song>/song.json, then ace-synth renders it to audio,
 matching the tonal quality of the work's timbre reference when song.json names one.
 
 Usage:
-    python3 engine/music/generate.py ground-truth --seeds 7 11 23
+    python3 engine/music/generate.py 1-ground-truth --seeds 7 11 23
     # keep an earlier composition, synthesise it again (e.g. with the timbre reference)
-    python3 engine/music/generate.py ground-truth --seeds 7 --suffix _b \\
-        --codes ground-truth/composition-take7.json
+    python3 engine/music/generate.py 1-ground-truth --seeds 7 --suffix _b \\
+        --codes 1-ground-truth/composition-take7.json
 """
 import argparse
 import json
