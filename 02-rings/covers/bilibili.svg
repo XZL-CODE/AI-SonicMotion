@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <!-- More Rings Than Years · 年轮 — Bilibili cover, 16:9.
+       Text stays inside x 240–1680 (the 4:3 crop of the mobile feed) and above y 900
+       (play count bottom-left, duration bottom-right). The cut trunk sits to the right. -->
+  <style>
+    @font-face { font-family: "Cormorant Garamond"; font-weight: 300 700;
+                 src: url("../../.tools/fonts/CormorantGaramond%5Bwght%5D.ttf"); }
+    @font-face { font-family: "Cormorant Garamond"; font-style: italic; font-weight: 300 700;
+                 src: url("../../.tools/fonts/CormorantGaramond-Italic%5Bwght%5D.ttf"); }
+    @font-face { font-family: "Noto Serif SC"; font-weight: 200 900;
+                 src: url("../../.tools/fonts/NotoSerifSC%5Bwght%5D.ttf"); }
+    .en { font-family: "Cormorant Garamond", "Baskerville", "Didot", serif; }
+    .zh { font-family: "Noto Serif SC", "Songti SC", "STSong", serif; }
+    text { fill: #fff4e4; text-anchor: middle; }
+  </style>
+
+  <defs>
+    <!-- the dark around the trunk, warmer towards it -->
+    <radialGradient id="ground" cx="1460" cy="560" r="1500" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3a2416"/>
+      <stop offset="0.45" stop-color="#1a110b"/>
+      <stop offset="1" stop-color="#090706"/>
+    </radialGradient>
+    <!-- the cut face: pale near the pith, darker wood towards the bark -->
+    <radialGradient id="wood" cx="1460" cy="560" r="530" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8a5a33"/>
+      <stop offset="0.5" stop-color="#74492a"/>
+      <stop offset="0.9" stop-color="#5a3720"/>
+      <stop offset="1" stop-color="#4a2c19"/>
+    </radialGradient>
+    <!-- light falling on the face from the upper left, so the text side glows -->
+    <radialGradient id="sheen" cx="1180" cy="330" r="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd9a0" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#ffd9a0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vignette" cx="900" cy="540" r="1150" gradientUnits="userSpaceOnUse">
+      <stop offset="0.55" stop-color="#050403" stop-opacity="0"/>
+      <stop offset="1" stop-color="#050403" stop-opacity="0.7"/>
+    </radialGradient>
+    <!-- keeps the left column readable where the rings run under the title -->
+    <linearGradient id="shade" x1="240" y1="0" x2="1180" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#090706" stop-opacity="0.75"/>
+      <stop offset="0.7" stop-color="#090706" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#090706" stop-opacity="0"/>
+    </linearGradient>
+    <!-- rings are never true circles: a slow wobble, a little rougher at the bark -->
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0045" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="bark" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+    <filter id="ink" x="-10%" y="-30%" width="120%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="9" flood-color="#0a0604" flood-opacity="0.85"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#ground)"/>
+
+  <g transform="translate(30 0)">
+  <!-- bark, then the cut face -->
+  <circle cx="1460" cy="560" r="548" fill="#1c120c" filter="url(#bark)"/>
+  <circle cx="1460" cy="560" r="526" fill="url(#wood)" filter="url(#grain)"/>
+
+  <!-- latewood: one dark line closing each year (narrow years are the dry ones) -->
+  <g fill="none" stroke="#2a170c" stroke-opacity="0.75" filter="url(#grain)">
+    <circle cx="1461" cy="561" r="16" stroke-width="5"/>
+    <circle cx="1461" cy="560" r="33" stroke-width="4"/>
+    <circle cx="1460" cy="561" r="49" stroke-width="5"/>
+    <circle cx="1460" cy="560" r="64" stroke-width="4"/>
+    <circle cx="1459" cy="560" r="83" stroke-width="5"/>
+    <circle cx="1460" cy="559" r="96" stroke-width="3"/>
+    <circle cx="1460" cy="560" r="117" stroke-width="5"/>
+    <circle cx="1459" cy="559" r="131" stroke-width="4"/>
+    <circle cx="1460" cy="560" r="149" stroke-width="5"/>
+    <circle cx="1459" cy="560" r="160" stroke-width="3"/>
+    <circle cx="1460" cy="559" r="181" stroke-width="5"/>
+    <circle cx="1459" cy="559" r="198" stroke-width="5"/>
+    <circle cx="1460" cy="560" r="212" stroke-width="3"/>
+    <circle cx="1459" cy="558" r="233" stroke-width="5"/>
+    <circle cx="1458" cy="559" r="246" stroke-width="4"/>
+    <circle cx="1459" cy="559" r="268" stroke-width="5"/>
+    <circle cx="1458" cy="558" r="281" stroke-width="3"/>
+    <circle cx="1459" cy="559" r="303" stroke-width="5"/>
+    <circle cx="1458" cy="558" r="322" stroke-width="5"/>
+    <circle cx="1458" cy="558" r="335" stroke-width="3"/>
+    <circle cx="1457" cy="558" r="356" stroke-width="5"/>
+    <circle cx="1458" cy="557" r="377" stroke-width="5"/>
+    <circle cx="1457" cy="557" r="390" stroke-width="3"/>
+    <circle cx="1457" cy="558" r="411" stroke-width="5"/>
+    <circle cx="1456" cy="557" r="429" stroke-width="4"/>
+    <circle cx="1457" cy="557" r="447" stroke-width="5"/>
+    <circle cx="1456" cy="556" r="462" stroke-width="3"/>
+    <circle cx="1456" cy="557" r="481" stroke-width="5"/>
+    <circle cx="1455" cy="556" r="500" stroke-width="5"/>
+    <circle cx="1456" cy="556" r="516" stroke-width="4"/>
+  </g>
+
+  <!-- radial checks: the wood dried from the bark inward and split -->
+  <g fill="none" stroke="#1a0e07" stroke-linecap="round" filter="url(#grain)">
+    <path d="M 976 736 L 1080 699 L 1190 662" stroke-width="3.5" opacity="0.8"/>
+    <path d="M 1284 1044 L 1312 968 L 1338 896" stroke-width="3" opacity="0.75"/>
+    <path d="M 1640 1044 L 1622 980 L 1606 930" stroke-width="2.5" opacity="0.7"/>
+    <path d="M 974 386 L 1030 405 L 1082 424" stroke-width="2" opacity="0.6"/>
+  </g>
+
+  <rect width="1920" height="1080" fill="url(#sheen)"/>
+
+  <!-- false rings: the years that grew twice, thin and pale -->
+  <g fill="none" stroke="#ffe8c2" filter="url(#grain)">
+    <circle cx="1460" cy="560" r="73" stroke-width="2.2" opacity="0.75"/>
+    <circle cx="1459" cy="559" r="205" stroke-width="2.2" opacity="0.7"/>
+    <circle cx="1457" cy="557" r="383" stroke-width="2.2" opacity="0.7"/>
+    <circle cx="1456" cy="556" r="470" stroke-width="2" opacity="0.6"/>
+  </g>
+  <g fill="none" stroke="#ffd79a" filter="url(#glow)" opacity="0.55">
+    <circle cx="1460" cy="560" r="73" stroke-width="6"/>
+    <circle cx="1459" cy="559" r="205" stroke-width="6"/>
+    <circle cx="1457" cy="557" r="383" stroke-width="6"/>
+  </g>
+
+  <!-- the ring being counted -->
+  <g filter="url(#grain)">
+    <circle cx="1458" cy="558" r="322" fill="none" stroke="#ffb35c" stroke-width="22" opacity="0.5" filter="url(#glow)"/>
+    <circle cx="1458" cy="558" r="322" fill="none" stroke="#ffe3ad" stroke-width="4"/>
+  </g>
+  <!-- two small lights going round it together -->
+  <g fill="#fff6e2">
+    <circle cx="1215" cy="349" r="7"/>
+    <circle cx="1215" cy="349" r="20" opacity="0.35" filter="url(#glow)"/>
+    <circle cx="1147" cy="446" r="5.5"/>
+    <circle cx="1147" cy="446" r="16" opacity="0.3" filter="url(#glow)"/>
+  </g>
+  </g>
+
+  <rect width="1920" height="1080" fill="url(#shade)"/>
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+
+  <!-- motes in the light -->
+  <g fill="#ffd79a" filter="url(#soft)">
+    <circle cx="372" cy="182" r="3" opacity="0.7"/>
+    <circle cx="1068" cy="138" r="2.5" opacity="0.6"/>
+    <circle cx="884" cy="902" r="3" opacity="0.5"/>
+    <circle cx="1702" cy="132" r="2.5" opacity="0.6"/>
+    <circle cx="520" cy="968" r="2" opacity="0.45"/>
+    <circle cx="1120" cy="1002" r="3" opacity="0.5"/>
+  </g>
+
+  <g filter="url(#ink)">
+    <text class="zh" x="640" y="250" font-size="30" font-weight="500" letter-spacing="2" opacity="0.92">AI 原创 · 民谣 × Drum &amp; Bass</text>
+    <text class="en" x="640" y="420" font-size="150" font-weight="500">More Rings</text>
+    <text class="en" x="640" y="560" font-size="150" font-weight="500">Than Years</text>
+    <text class="zh" x="670" y="700" font-size="96" font-weight="600" letter-spacing="60">年轮</text>
+    <g stroke="#fff4e4" stroke-width="3" opacity="0.8">
+      <line x1="390" y1="666" x2="500" y2="666"/>
+      <line x1="840" y1="666" x2="950" y2="666"/>
+    </g>
+    <text class="en" x="640" y="800" font-size="46" font-style="italic" font-weight="500" opacity="0.96">You’ve got more rings than years</text>
+    <text class="zh" x="644" y="858" font-size="29" font-weight="400" letter-spacing="7" opacity="0.92">你的年轮，比年纪还多</text>
+  </g>
+</svg>

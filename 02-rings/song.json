@@ -1,0 +1,73 @@
+{
+  "title": "More Rings Than Years",
+  "title_zh": "年轮",
+  "timbre_reference": "timbre-reference.mp3",
+  "request": {
+    "lm_model": "acestep-5Hz-lm-4B-Q8_0.gguf",
+    "synth_model": "acestep-v15-turbo-Q8_0.gguf",
+    "caption": "Organic liquid drum and bass blended with chamber folk and slow-burn indie rock. Fingerpicked steel-string acoustic guitar and warm cello carry the song from the first bar, a steady piano ostinato and an unbroken drum groove hold it together, strings swell layer by layer. The verses stay sparse and intimate; fast rolling breakbeats with deep warm sub bass surge in underneath for every chorus; the bridge drops back to guitar, cello and voice; the final chorus is the fullest, and the outro returns to the fingerpicked guitar alone. Warm close-miked female lead vocal in slow half-time phrasing, long held notes, every word sung clearly, clear English diction. Wooden and earthy on the surface, a rush underneath, cinematic, hopeful, quietly strong",
+    "duration": 210,
+    "bpm": 174,
+    "keyscale": "A minor",
+    "timesignature": "4",
+    "vocal_language": "en",
+    "inference_steps": 8,
+    "guidance_scale": 1.0,
+    "shift": 3.0,
+    "output_format": "wav16"
+  },
+  "sections": [
+    {"tag": "Intro", "scene": "hill", "lines": []},
+    {"tag": "Verse 1", "scene": "roots", "chapter": {"no": "01", "en": "ROOTS", "zh": "根"}, "lines": [
+      {"en": "They say you're wise beyond your years", "zh": "他们总说你 懂事得不像这个年纪"},
+      {"en": "Like you were born already grown", "zh": "好像你生下来 就已经长大"},
+      {"en": "They never saw how deep the roots went down", "zh": "他们没看见 根往下扎得有多深"},
+      {"en": "To find the water on your own", "zh": "只为了 自己找到水"}
+    ]},
+    {"tag": "Pre-Chorus", "scene": "still", "chapter": {"no": "02", "en": "HOLDING STILL", "zh": "稳住"}, "lines": [
+      {"en": "You keep the shaking on the inside", "zh": "你把颤抖 都留在里面"},
+      {"en": "So the leaves won't give you away", "zh": "好让树叶 不出卖你"}
+    ]},
+    {"tag": "Chorus", "scene": "rings", "chapter": {"no": "03", "en": "RINGS", "zh": "年轮"}, "lines": [
+      {"en": "Steady as a tree when the wind is high", "zh": "风再大 你也稳得像一棵树"},
+      {"en": "Nobody sees how the summers ran dry", "zh": "没人看见 那些夏天有多旱"},
+      {"en": "Some years you had to grow up twice", "zh": "有些年 你得长大两次"},
+      {"en": "You've got more rings than years", "zh": "你的年轮 比年纪还多", "hook": true},
+      {"en": "More rings than years", "zh": "年轮 比年纪还多"}
+    ]},
+    {"tag": "Verse 2", "scene": "branches", "chapter": {"no": "04", "en": "DRY SEASON", "zh": "旱季"}, "lines": [
+      {"en": "You learned too soon the rain makes no promises", "zh": "你太早就知道 雨从不许诺什么"},
+      {"en": "So you count the cost of every branch you grow", "zh": "所以每长一根枝 你都先算好代价"},
+      {"en": "You never wait for kinder weather", "zh": "你从不等天气变好"},
+      {"en": "You reach for light, however slow", "zh": "再慢 也朝着光长"}
+    ]},
+    {"tag": "Pre-Chorus", "scene": "still", "lines": [
+      {"en": "You keep the shaking on the inside", "zh": "你把颤抖 都留在里面"},
+      {"en": "So the leaves won't give you away", "zh": "好让树叶 不出卖你"}
+    ]},
+    {"tag": "Chorus", "scene": "rings", "lines": [
+      {"en": "Steady as a tree when the wind is high", "zh": "风再大 你也稳得像一棵树"},
+      {"en": "Nobody sees how the summers ran dry", "zh": "没人看见 那些夏天有多旱"},
+      {"en": "Some years you had to grow up twice", "zh": "有些年 你得长大两次"},
+      {"en": "You've got more rings than years", "zh": "你的年轮 比年纪还多", "hook": true},
+      {"en": "More rings than years", "zh": "年轮 比年纪还多"}
+    ]},
+    {"tag": "Bridge", "scene": "counting", "chapter": {"no": "05", "en": "COUNTING", "zh": "数年轮"}, "lines": [
+      {"en": "Everybody calls you strong", "zh": "每个人都说你坚强"},
+      {"en": "And then they let you carry on", "zh": "然后让你 一个人接着扛"},
+      {"en": "I'd rather count the rings with you", "zh": "我宁愿陪你 数一数年轮", "hook": true},
+      {"en": "And learn the cost of everything", "zh": "看清 每一圈都付出了什么", "hook": true}
+    ]},
+    {"tag": "Final Chorus", "scene": "seasons", "chapter": {"no": "06", "en": "MORE RINGS THAN YEARS", "zh": "比年纪多"}, "lines": [
+      {"en": "Steady as a tree when the wind is high", "zh": "风再大 你也稳得像一棵树"},
+      {"en": "Now I can see how the summers ran dry", "zh": "现在我看见了 那些夏天有多旱", "hook": true},
+      {"en": "Some years you had to grow up twice", "zh": "有些年 你得长大两次"},
+      {"en": "You've got more rings than years", "zh": "你的年轮 比年纪还多", "hook": true},
+      {"en": "More rings than years", "zh": "年轮 比年纪还多"}
+    ]},
+    {"tag": "Outro", "scene": "dawn", "chapter": {"no": "07", "en": "STILL GROWING", "zh": "还在长"}, "lines": [
+      {"en": "More rings than years", "zh": "年轮 比年纪还多"},
+      {"en": "And still you grow", "zh": "而你 还在长"}
+    ]}
+  ]
+}
