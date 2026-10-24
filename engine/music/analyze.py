@@ -5,7 +5,7 @@ song.json with a global (Needleman-Wunsch) alignment, so repeated choruses map i
 and words the recogniser misses are interpolated from their neighbours.
 
 Usage:
-    python3 engine/music/analyze.py 1-ground-truth 1-ground-truth/outputs/takes/take_7.wav
+    python3 engine/music/analyze.py 01-ground-truth 01-ground-truth/outputs/takes/take_7.wav
 """
 import argparse
 import difflib

@@ -12,7 +12,7 @@ Status: proposed
 - 英文演唱，字幕为英文歌词配中文译文；时长 2–4 分钟；16:9、1080p、2.35:1 遮幅。
 - 风格以用户选定的样例 B 为基准：深夜 R&B / neo-soul，约 64 BPM，稀疏鼓组，Rhodes 与气声男声。
 - 主题"夜航与落地"只通过意象表达；仓库、成片与对外文案不出现可识别的个人信息，意象与个人经历的对应只在对话中说明。
-- 画面由最终音频驱动：节拍、底鼓与唱词逐词时间来自 `engine/music/analyze.py`，逐帧渲染在 `engine/video/`，本曲画面在 `ground-truth/scenes.py`。
+- 画面由最终音频驱动：节拍、底鼓与唱词逐词时间来自 `engine/music/analyze.py`，逐帧渲染在 `engine/video/`，本曲画面在 `01-ground-truth/scenes.py`。
 - 片尾标注"AI 生成内容"。
 
 ## Related notes

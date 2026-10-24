@@ -5,7 +5,7 @@ Inputs are the song's song.json (sections, scenes, lyrics + translations), its s
 (beats, kicks, per-frame energy, word timing).
 
 Usage:
-    python3 engine/video/render.py 1-ground-truth 1-ground-truth/outputs/analysis/take_7.json
+    python3 engine/video/render.py 01-ground-truth 01-ground-truth/outputs/analysis/take_7.json
     python3 engine/video/render.py ... --stills 12,48,95        # PNG previews at those seconds
     python3 engine/video/render.py ... --start 40 --end 70      # render a clip
 """
