@@ -28,7 +28,7 @@
       {"en": "You keep the shaking on the inside", "zh": "你把颤抖 都留在里面"},
       {"en": "So the leaves won't give you away", "zh": "好让树叶 不出卖你"}
     ]},
-    {"tag": "Chorus", "scene": "storm", "chapter": {"no": "03", "en": "STORM", "zh": "暴风雨"}, "lines": [
+    {"tag": "Chorus", "scene": "storm", "lead": -0.2, "chapter": {"no": "03", "en": "STORM", "zh": "暴风雨"}, "lines": [
       {"en": "Still you stand when the wind is high", "zh": "风再大 你还是站着"},
       {"en": "Nobody sees how the summers ran dry", "zh": "没人看见 那些夏天有多旱"},
       {"en": "Some years you had to grow twice", "zh": "有些年 你得长两次"},
@@ -45,7 +45,7 @@
       {"en": "You keep the shaking on the inside", "zh": "你把颤抖 都留在里面"},
       {"en": "So the leaves won't give you away", "zh": "好让树叶 不出卖你"}
     ]},
-    {"tag": "Chorus", "scene": "winter", "chapter": {"no": "06", "en": "WINTER", "zh": "冬"}, "lines": [
+    {"tag": "Chorus", "scene": "winter", "lead": -0.2, "chapter": {"no": "06", "en": "WINTER", "zh": "冬"}, "lines": [
       {"en": "Still you stand when the wind is high", "zh": "风再大 你还是站着"},
       {"en": "Nobody sees how the summers ran dry", "zh": "没人看见 那些夏天有多旱"},
       {"en": "Some years you had to grow twice", "zh": "有些年 你得长两次"},

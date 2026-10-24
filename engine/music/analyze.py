@@ -165,8 +165,10 @@ def sections_timing(song, lines, downbeats, duration):
         if si == 0:
             starts.append(0.0)
         elif si in first:
-            # cut on the last downbeat at least half a bar before the first sung word
-            before = [d for d in downbeats if d <= first[si] - 0.9]
+            # cut on the last downbeat at least half a bar before the first sung word; a section may set its
+            # own "lead" (seconds; negative cuts on the downbeat that lands with the word, when the line before
+            # runs right up to it)
+            before = [d for d in downbeats if d <= first[si] - song["sections"][si].get("lead", 0.9)]
             starts.append(before[-1] if before else first[si] - 1.0)
         else:
             starts.append(starts[-1])

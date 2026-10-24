@@ -7,20 +7,20 @@
 | 目录 | 歌名 | 风格 | 当前版本 |
 |---|---|---|---|
 | [`01-ground-truth/`](01-ground-truth/README.md) | Ground Truth · 落地 | 深夜 R&B / neo-soul，英文演唱配中文字幕 | 作曲 take 7 + 样例 B 音色；MV 第二版；B 站与公众号封面 |
-| [`02-rings/`](02-rings/README.md) | More Rings Than Years · 年轮 | 有机 drum & bass，融合室内民谣与慢燃独立摇滚，英文演唱配中文字幕 | 作曲 take 11 + 样例 D 音色；MV 第一版；B 站与公众号封面 |
+| [`02-rings/`](02-rings/README.md) | More Rings Than Years · 年轮 | 木质民谣与慢燃摇滚的融合，英文演唱配中文字幕 | 作曲 take 7 + 样例 A 音色；MV 第二版（发光风格）；B 站与公众号封面 |
 
 ## 目录
 
 | 路径 | 作用 |
 |---|---|
 | `<歌>/README.md` | 这首歌的歌名、简介、歌词、段落与画面、文件说明、重新生成命令 |
-| `<歌>/song.json` | 这首歌的单一事实源：风格描述、生成参数、音色参考、分段歌词（英文演唱 + 中文译文、大字歌词标记）、每段的画面场景与章节名 |
+| `<歌>/song.json` | 这首歌的单一事实源：风格描述、生成参数、音色参考、分段歌词（英文演唱 + 中文译文、大字歌词标记）、每段的画面场景与章节名（某段的画面切换点可用 `lead` 另设） |
 | `<歌>/scenes.py` | 这首歌的画面：每个场景名对应一个逐帧绘制函数，可选 `FLASH_INTO`（哪些场景以一闪白光开场） |
 | `<歌>/covers/` | 这首歌的发布封面：为它单独设计、手写的 SVG，以及导出的 JPG |
 | `<歌>/outputs/` | 生成的音频、分析结果、静帧与视频（不入库） |
 | `engine/music/setup_acestep.sh` | 拉取固定版本的 [acestep.cpp](https://github.com/ServeurpersoCom/acestep.cpp)（ACE-Step 1.5 的 C++ 运行时）、编译、下载量化模型（约 7.7 GB） |
 | `engine/music/generate.py` | 每个随机种子生成一版完整的歌（take）；`--codes` 复用已有作曲只重新合成 |
-| `engine/music/analyze.py` | 节拍、底鼓、逐帧能量与 24 段频谱，以及唱词逐词时间（Whisper 识别后与歌词做全局对齐，重复的副歌按顺序对上，没识别到的词按前后插值） |
+| `engine/music/analyze.py` | 节拍、底鼓、逐帧能量与 24 段频谱，唱词逐词时间（Whisper 识别后与歌词做全局对齐，重复的副歌按顺序对上，没识别到的词按前后插值），以及各段画面的切换点（默认落在该段首个唱词前至少半小节的强拍上） |
 | `engine/video/gfx.py` | 图形基元：可平铺噪声、透视相机、光点、泛光、体积光、镜头光晕、色调 |
 | `engine/video/render.py` | 载入这首歌的 `scenes.py`；时间线与转场（闪光、漏光）、底鼓推镜与色散、字幕（唱到的词逐个点亮）、大字歌词逐词落下、章节标题、多进程渲染、ffmpeg 编码 |
 | `.tools/` | acestep.cpp、模型与字体（不入库） |
