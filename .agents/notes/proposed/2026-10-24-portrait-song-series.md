@@ -29,6 +29,7 @@ Status: proposed
 
 - [仓库按"一首歌一个二级项目"组织](2026-10-18-songs-as-subprojects.md)：每首的风格试听、封面和目录命名照此执行
 - [《Ground Truth · 落地》音乐与 MV 生成](2026-10-18-ground-truth-music-video.md)：写过印象第 4 段那一面
+- [《More Rings Than Years · 年轮》音乐与 MV 生成](2026-10-24-rings-music-video.md)：系列第 1 首
 
 ## Related materials
 

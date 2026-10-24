@@ -81,6 +81,8 @@ SVG 用 `.tools/fonts/` 里的字体（首次渲染时下载），没有时退�
 
 接下来的人物印象系列（6 首英文歌）每首写什么、用什么意象、按什么顺序做，见 [Agent Note：人物印象系列（英文歌）的规划](.agents/notes/proposed/2026-10-24-portrait-song-series.md)。
 
+《年轮》的曲风、人称与结尾、挑 take 的依据和画面取舍，见 [Agent Note：《More Rings Than Years · 年轮》音乐与 MV 生成](.agents/notes/proposed/2026-10-24-rings-music-video.md)。
+
 ## 许可与标注
 
 - ACE-Step 1.5 模型为 MIT 许可，模型卡说明生成内容可商用。
