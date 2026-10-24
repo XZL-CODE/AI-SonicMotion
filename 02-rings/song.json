@@ -5,10 +5,10 @@
   "request": {
     "lm_model": "acestep-5Hz-lm-4B-Q8_0.gguf",
     "synth_model": "acestep-v15-turbo-Q8_0.gguf",
-    "caption": "Organic liquid drum and bass blended with chamber folk and slow-burn indie rock. Fingerpicked steel-string acoustic guitar and warm cello carry the song from the first bar, a steady piano ostinato and an unbroken drum groove hold it together, strings swell layer by layer. The verses stay sparse and intimate; fast rolling breakbeats with deep warm sub bass surge in underneath for every chorus; the bridge drops back to guitar, cello and voice; the final chorus is the fullest, and the outro returns to the fingerpicked guitar alone. Warm close-miked female lead vocal in slow half-time phrasing, long held notes, every word sung clearly, clear English diction. Wooden and earthy on the surface, a rush underneath, cinematic, hopeful, quietly strong",
-    "duration": 210,
-    "bpm": 174,
-    "keyscale": "A minor",
+    "caption": "Cinematic chamber folk ballad blended with slow-burn indie rock. Fingerpicked steel-string acoustic guitar and warm cello, a steady piano ostinato, soft brushed drums and a slow deep kick that move with the vocal at the same slow tempo, no fast breakbeats. The verses stay sparse and intimate with guitar, cello and piano; in every chorus the drums, strings and electric guitar swell in layer by layer; the bridge drops back to guitar and voice; the final chorus is the widest and fullest; the outro returns to the fingerpicked guitar alone. Warm close-miked female lead vocal, unhurried phrasing, every word sung clearly, clear English diction. Wooden, earthy, tender, quietly strong, cinematic",
+    "duration": 230,
+    "bpm": 76,
+    "keyscale": "G major",
     "timesignature": "4",
     "vocal_language": "en",
     "inference_steps": 8,
@@ -17,55 +17,55 @@
     "output_format": "wav16"
   },
   "sections": [
-    {"tag": "Intro", "scene": "hill", "lines": []},
-    {"tag": "Verse 1", "scene": "roots", "chapter": {"no": "01", "en": "ROOTS", "zh": "根"}, "lines": [
-      {"en": "They say you're wise beyond your years", "zh": "他们总说你 懂事得不像这个年纪"},
-      {"en": "Like you were born already grown", "zh": "好像你生下来 就已经长大"},
-      {"en": "They never saw how deep the roots went down", "zh": "他们没看见 根往下扎得有多深"},
-      {"en": "To find the water on your own", "zh": "只为了 自己找到水"}
+    {"tag": "Intro", "scene": "seed", "lines": []},
+    {"tag": "Verse 1", "scene": "sapling", "chapter": {"no": "01", "en": "SAPLING", "zh": "小树"}, "lines": [
+      {"en": "High on the hill where the wind has its way", "zh": "山坡上 风总是说了算"},
+      {"en": "A thin little tree learned to bend and to stay", "zh": "一棵细细的树 学会了弯下 又站稳"},
+      {"en": "Down in the dark where nobody goes", "zh": "在没人去的黑暗里"},
+      {"en": "The roots kept on walking to where water flows", "zh": "根一直往前走 走到有水的地方"}
     ]},
-    {"tag": "Pre-Chorus", "scene": "still", "chapter": {"no": "02", "en": "HOLDING STILL", "zh": "稳住"}, "lines": [
+    {"tag": "Pre-Chorus", "scene": "lull", "chapter": {"no": "02", "en": "BEFORE THE STORM", "zh": "风暴之前"}, "lines": [
       {"en": "You keep the shaking on the inside", "zh": "你把颤抖 都留在里面"},
       {"en": "So the leaves won't give you away", "zh": "好让树叶 不出卖你"}
     ]},
-    {"tag": "Chorus", "scene": "rings", "chapter": {"no": "03", "en": "RINGS", "zh": "年轮"}, "lines": [
-      {"en": "Steady as a tree when the wind is high", "zh": "风再大 你也稳得像一棵树"},
+    {"tag": "Chorus", "scene": "storm", "chapter": {"no": "03", "en": "STORM", "zh": "暴风雨"}, "lines": [
+      {"en": "Still you stand when the wind is high", "zh": "风再大 你还是站着"},
       {"en": "Nobody sees how the summers ran dry", "zh": "没人看见 那些夏天有多旱"},
-      {"en": "Some years you had to grow up twice", "zh": "有些年 你得长大两次"},
+      {"en": "Some years you had to grow twice", "zh": "有些年 你得长两次"},
       {"en": "You've got more rings than years", "zh": "你的年轮 比年纪还多", "hook": true},
       {"en": "More rings than years", "zh": "年轮 比年纪还多"}
     ]},
-    {"tag": "Verse 2", "scene": "branches", "chapter": {"no": "04", "en": "DRY SEASON", "zh": "旱季"}, "lines": [
-      {"en": "You learned too soon the rain makes no promises", "zh": "你太早就知道 雨从不许诺什么"},
-      {"en": "So you count the cost of every branch you grow", "zh": "所以每长一根枝 你都先算好代价"},
+    {"tag": "Verse 2", "scene": "drought", "chapter": {"no": "04", "en": "DRY SEASON", "zh": "旱季"}, "lines": [
+      {"en": "The rain makes no promises, clouds pass you by", "zh": "雨从不许诺 云只是路过"},
+      {"en": "So you weigh every branch that you send to the sky", "zh": "每一根伸向天空的枝 你都先掂量过"},
       {"en": "You never wait for kinder weather", "zh": "你从不等天气变好"},
       {"en": "You reach for light, however slow", "zh": "再慢 也朝着光长"}
     ]},
-    {"tag": "Pre-Chorus", "scene": "still", "lines": [
+    {"tag": "Pre-Chorus", "scene": "autumn", "chapter": {"no": "05", "en": "AUTUMN", "zh": "秋"}, "lines": [
       {"en": "You keep the shaking on the inside", "zh": "你把颤抖 都留在里面"},
       {"en": "So the leaves won't give you away", "zh": "好让树叶 不出卖你"}
     ]},
-    {"tag": "Chorus", "scene": "rings", "lines": [
-      {"en": "Steady as a tree when the wind is high", "zh": "风再大 你也稳得像一棵树"},
+    {"tag": "Chorus", "scene": "winter", "chapter": {"no": "06", "en": "WINTER", "zh": "冬"}, "lines": [
+      {"en": "Still you stand when the wind is high", "zh": "风再大 你还是站着"},
       {"en": "Nobody sees how the summers ran dry", "zh": "没人看见 那些夏天有多旱"},
-      {"en": "Some years you had to grow up twice", "zh": "有些年 你得长大两次"},
+      {"en": "Some years you had to grow twice", "zh": "有些年 你得长两次"},
       {"en": "You've got more rings than years", "zh": "你的年轮 比年纪还多", "hook": true},
       {"en": "More rings than years", "zh": "年轮 比年纪还多"}
     ]},
-    {"tag": "Bridge", "scene": "counting", "chapter": {"no": "05", "en": "COUNTING", "zh": "数年轮"}, "lines": [
-      {"en": "Everybody calls you strong", "zh": "每个人都说你坚强"},
-      {"en": "And then they let you carry on", "zh": "然后让你 一个人接着扛"},
+    {"tag": "Bridge", "scene": "counting", "chapter": {"no": "07", "en": "COUNTING", "zh": "数年轮"}, "lines": [
+      {"en": "Birds come and go with the turning year", "zh": "鸟来了又走 跟着年岁转"},
+      {"en": "Nobody stays to read what's written here", "zh": "没有谁留下来 读一读这里写了什么"},
       {"en": "I'd rather count the rings with you", "zh": "我宁愿陪你 数一数年轮", "hook": true},
       {"en": "And learn the cost of everything", "zh": "看清 每一圈都付出了什么", "hook": true}
     ]},
-    {"tag": "Final Chorus", "scene": "seasons", "chapter": {"no": "06", "en": "MORE RINGS THAN YEARS", "zh": "比年纪多"}, "lines": [
-      {"en": "Steady as a tree when the wind is high", "zh": "风再大 你也稳得像一棵树"},
+    {"tag": "Final Chorus", "scene": "spring", "chapter": {"no": "08", "en": "SPRING", "zh": "春"}, "lines": [
+      {"en": "Still you stand when the wind is high", "zh": "风再大 你还是站着"},
       {"en": "Now I can see how the summers ran dry", "zh": "现在我看见了 那些夏天有多旱", "hook": true},
-      {"en": "Some years you had to grow up twice", "zh": "有些年 你得长大两次"},
+      {"en": "Some years you had to grow twice", "zh": "有些年 你得长两次"},
       {"en": "You've got more rings than years", "zh": "你的年轮 比年纪还多", "hook": true},
       {"en": "More rings than years", "zh": "年轮 比年纪还多"}
     ]},
-    {"tag": "Outro", "scene": "dawn", "chapter": {"no": "07", "en": "STILL GROWING", "zh": "还在长"}, "lines": [
+    {"tag": "Outro", "scene": "dawn", "chapter": {"no": "09", "en": "STILL GROWING", "zh": "还在长"}, "lines": [
       {"en": "More rings than years", "zh": "年轮 比年纪还多"},
       {"en": "And still you grow", "zh": "而你 还在长"}
     ]}
