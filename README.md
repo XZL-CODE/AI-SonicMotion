@@ -78,6 +78,8 @@ SVG 用 `.tools/fonts/` 里的字体（首次渲染时下载），没有时退�
 
 出歌方式、成片规格与个人信息边界见 [Agent Note：《Ground Truth · 落地》音乐与 MV 生成](.agents/notes/proposed/2026-10-18-ground-truth-music-video.md)。
 
+接下来的人物印象系列（6 首英文歌）每首写什么、用什么意象、人称与顺序，见 [Agent Note：人物印象系列（英文歌）的规划](.agents/notes/proposed/2026-10-24-portrait-song-series.md)。
+
 ## 许可与标注
 
 - ACE-Step 1.5 模型为 MIT 许可，模型卡说明生成内容可商用。

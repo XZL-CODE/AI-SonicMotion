@@ -18,3 +18,4 @@ Status: proposed
 ## Related notes
 
 - [《Ground Truth · 落地》音乐与 MV 生成](2026-10-18-ground-truth-music-video.md)
+- [人物印象系列（英文歌）的规划](2026-10-24-portrait-song-series.md)
