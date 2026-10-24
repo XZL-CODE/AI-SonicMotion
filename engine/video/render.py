@@ -201,6 +201,15 @@ class Typesetter:
             t1 = max(t0 + 0.4, min(nxt - 0.55, ln["end"] + 2.2))
             self.windows.append((t0, t1))
             prev_out = t1 + 0.3
+        # the opening title card fills the intro; when the singing starts too soon for that, it opens
+        # the song over the first lines instead, and the first chapter mark waits until it has gone
+        first_line = self.starts[0] if self.starts else 12.0
+        if first_line >= 8.0:
+            self.title_in, self.title_out = (1.8, 4.0), (first_line - 3.2, first_line - 1.4)
+            self.chapters_from = 0.0
+        else:
+            self.title_in, self.title_out = (0.6, 2.0), (5.6, 7.0)
+            self.chapters_from = 7.3
         self.hook_fonts = {}
 
     def _line(self, ln):
@@ -323,7 +332,7 @@ class Typesetter:
             ch = info.get("chapter")
             if not ch:
                 continue
-            t0 = sec["start"] + 0.6
+            t0 = max(sec["start"] + 0.6, self.chapters_from)
             if not (t0 <= t <= t0 + 6.5):
                 continue
             a = gfx.smoothstep(t0, t0 + 0.6, t) * (1 - gfx.smoothstep(t0 + 5.2, t0 + 6.4, t))
@@ -341,8 +350,7 @@ class Typesetter:
 
     def _titles(self, dr, gd, t):
         W, H, s = self.W, self.H, self.scale
-        first_line = self.starts[0] if self.starts else 12.0
-        a = gfx.smoothstep(1.8, 4.0, t) * (1 - gfx.smoothstep(first_line - 3.2, first_line - 1.4, t))
+        a = gfx.smoothstep(*self.title_in, t) * (1 - gfx.smoothstep(*self.title_out, t))
         # the end card waits until the last hook line has left the picture
         hook_out = [w[1] + 0.9 for ln, w in zip(self.lines, self.windows) if self._line(ln).get("hook")]
         t_end = min(max([self.duration - 14] + hook_out), self.duration - 4.0)

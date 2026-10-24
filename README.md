@@ -7,6 +7,7 @@
 | 目录 | 歌名 | 风格 | 当前版本 |
 |---|---|---|---|
 | [`01-ground-truth/`](01-ground-truth/README.md) | Ground Truth · 落地 | 深夜 R&B / neo-soul，英文演唱配中文字幕 | 作曲 take 7 + 样例 B 音色；MV 第二版；B 站与公众号封面 |
+| [`02-rings/`](02-rings/README.md) | More Rings Than Years · 年轮 | 有机 drum & bass，融合室内民谣与慢燃独立摇滚，英文演唱配中文字幕 | 作曲 take 11 + 样例 D 音色；MV 第一版；B 站与公众号封面 |
 
 ## 目录
 
